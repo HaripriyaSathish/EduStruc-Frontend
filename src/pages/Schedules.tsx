@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, apiFetch } from '../utils/auth';
 import AvatarCircle from '../components/AvatarCircle';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const roleLabel: Record<string, string> = {
   admin: 'Super Admin', teacher: 'Faculty Member', parent: 'Parent',
