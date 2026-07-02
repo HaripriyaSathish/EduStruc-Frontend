@@ -53,7 +53,7 @@ const CURRENT_MONTH = now.getMonth() + 1; // 1-12
 const CURRENT_YEAR  = now.getFullYear();
 
 const ITEMS_PER_PAGE = 5;
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function TeacherStudents() {
   const navigate = useNavigate();

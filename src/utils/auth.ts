@@ -1,4 +1,4 @@
-const API_BASE = 'http://127.0.0.1:8000/api';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export interface User {
   id: number;
@@ -54,7 +54,7 @@ export const registerUser = async (data: {
   phone?: string;
 }): Promise<{ success: boolean; message: string }> => {
   try {
-    const response = await fetch(`${API_BASE}/auth/register/`, {
+    const response = await fetch(`${API_BASE}/api/auth/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -79,7 +79,7 @@ export const loginUser = async (
   remember: boolean = false
 ): Promise<{ success: boolean; message: string; user?: User }> => {
   try {
-    const response = await fetch(`${API_BASE}/auth/login/`, {
+    const response = await fetch(`${API_BASE}/api/auth/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, role }),
@@ -101,7 +101,7 @@ export const refreshAccessToken = async (): Promise<boolean> => {
   const refresh = store.getItem('refresh_token');
   if (!refresh) return false;
   try {
-    const res = await fetch(`${API_BASE}/auth/token/refresh/`, {
+    const res = await fetch(`${API_BASE}/api/auth/token/refresh/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh }),

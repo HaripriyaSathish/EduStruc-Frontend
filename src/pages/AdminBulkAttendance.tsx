@@ -12,7 +12,7 @@ import {
 import { getSession, logoutUser, apiFetch } from '../utils/auth';
 import AvatarCircle from '../components/AvatarCircle';
 
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 type AttStatus = 'present' | 'absent' | 'holiday';
 

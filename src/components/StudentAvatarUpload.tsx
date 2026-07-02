@@ -5,7 +5,7 @@ import { useState, useRef } from 'react';
 import { Camera, X } from 'lucide-react';
 import { apiFetch } from '../utils/auth';
 
-const API_BASE = 'http://192.168.1.6:8000'; // update to your LAN IP
+const API_BASE = import.meta.env.VITE_API_URL;// update to your LAN IP
 
 interface Props {
   studentId:      number;
