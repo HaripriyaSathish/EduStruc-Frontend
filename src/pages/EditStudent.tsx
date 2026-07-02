@@ -8,6 +8,7 @@ import {
 import { getSession, logoutUser, getAuthHeader } from '../utils/auth';
 import AvatarCircle from '../components/AvatarCircle';
 import StudentAvatarUpload from '../components/StudentAvatarUpload';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const roleLabel: Record<string, string> = {
   admin: 'Super Admin', teacher: 'Faculty Member', parent: 'Parent',
@@ -52,7 +53,7 @@ export default function EditStudent() {
   useEffect(() => {
     const fetchStudent = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/students/${id}/`, {
+        const res = await fetch(`${API_BASE}/api/students/${id}/`, {
           headers: { ...getAuthHeader() },
         });
         if (res.ok) {
@@ -96,7 +97,7 @@ export default function EditStudent() {
     }
     setSaving(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/students/${id}/`, {
+      const res = await fetch(`${API_BASE}/api/students/${id}/`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
         body: JSON.stringify(form),

@@ -86,7 +86,7 @@ export default function HelpSupport() {
   const fetchTickets = async () => {
     setLoadingTickets(true);
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/support-tickets/');
+      const res = await apiFetch(`${API_BASE}/api/support-tickets/`);
       if (res.ok) setTickets(await res.json());
     } catch (e) {
       console.error('Ticket fetch error:', e);
@@ -100,7 +100,7 @@ export default function HelpSupport() {
   const handleSubmitTicket = async () => {
     if (!ticket.subject || !ticket.message) return;
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/support-tickets/', {
+      const res = await apiFetch(`${API_BASE}/api/support-tickets/`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(ticket),
@@ -121,7 +121,7 @@ export default function HelpSupport() {
     if (!text) return;
     setRespondingId(id);
     try {
-      const res = await apiFetch(`http://127.0.0.1:8000/api/support-tickets/${id}/respond/`, {
+      const res = await apiFetch(`${API_BASE}/api/support-tickets/${id}/respond/`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ response: text }),
@@ -138,7 +138,7 @@ export default function HelpSupport() {
   const handleResolve = async (id: number) => {
     setResolvingId(id);
     try {
-      const res = await apiFetch(`http://127.0.0.1:8000/api/support-tickets/${id}/resolve/`, { method: 'POST' });
+      const res = await apiFetch(`${API_BASE}/api/support-tickets/${id}/resolve/`, { method: 'POST' });
       if (res.ok) {
         const updated = await res.json();
         setTickets(prev => prev.map(t => t.id === id ? updated : t));

@@ -9,6 +9,7 @@ import {
 import { getSession, logoutUser, apiFetch } from '../utils/auth';
 import AvatarCircle from '../components/AvatarCircle';
 import { broadcastAvatarChange } from '../hooks/useAvatar';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const roleLabel: Record<string, string> = {
   admin: 'Super Admin', teacher: 'Faculty Member', parent: 'Parent',
@@ -74,7 +75,7 @@ export default function SystemSettings() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const res = await apiFetch('http://127.0.0.1:8000/api/auth/profile/');
+        const res = await apiFetch(`${API_BASE}/api/auth/profile/`);
         if (res.ok) {
           const data = await res.json();
           setProfile({
@@ -106,7 +107,7 @@ export default function SystemSettings() {
     setErrorMsg('');
     setSavedMsg('');
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/auth/profile/', {
+      const res = await apiFetch(`${API_BASE}/api/auth/profile/`, {
         method:  'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
@@ -152,7 +153,7 @@ export default function SystemSettings() {
     try {
       const formData = new FormData();
       formData.append('avatar', file);
-      const res = await apiFetch('http://127.0.0.1:8000/api/auth/avatar/', {
+      const res = await apiFetch(`${API_BASE}/api/auth/avatar/`, {
         method: 'POST',
         body:   formData,
       });
@@ -182,7 +183,7 @@ export default function SystemSettings() {
   const handleToggle2FA = async () => {
     setTogglingFA(true);
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/auth/toggle-2fa/', { method: 'POST' });
+      const res = await apiFetch(`${API_BASE}/api/auth/toggle-2fa/`, { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
         setTwoFA(data.two_fa_enabled);
@@ -206,7 +207,7 @@ export default function SystemSettings() {
 
     setPwLoading(true);
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/auth/change-password/', {
+      const res = await apiFetch(`${API_BASE}/api/auth/change-password/`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ current_password: pw.current, new_password: pw.newPw }),
@@ -232,7 +233,7 @@ export default function SystemSettings() {
     if (!deactivatePass) { setDeactivateError('Enter your password to confirm.'); return; }
     setDeactivateLoading(true);
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/auth/deactivate/', {
+      const res = await apiFetch(`${API_BASE}/api/auth/deactivate/`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ password: deactivatePass }),

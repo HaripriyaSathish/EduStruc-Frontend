@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, getAuthHeader } from '../utils/auth';
 import AvatarCircle from '../components/AvatarCircle';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 interface Student {
   id:           number;
@@ -47,7 +48,7 @@ export default function Students() {
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      let url = 'http://127.0.0.1:8000/api/students/?';
+      let url = `${API_BASE}/api/students/?`;
       if (searchQuery) url += `search=${searchQuery}&`;
       const res = await fetch(url, { headers: { ...getAuthHeader() } });
       if (res.ok) {
@@ -78,7 +79,7 @@ export default function Students() {
   const handleDelete = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this student?')) return;
     try {
-      await fetch(`http://127.0.0.1:8000/api/students/${id}/`, {
+      await fetch(`${API_BASE}/api/students/${id}/`, {
         method: 'DELETE',
         headers: { ...getAuthHeader() },
       });

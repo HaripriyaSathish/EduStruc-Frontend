@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, getAuthHeader } from '../utils/auth';
 import AvatarCircle from '../components/AvatarCircle';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const roleLabel: Record<string, string> = {
   admin: 'Super Admin', teacher: 'Faculty Member', parent: 'Parent',
@@ -42,7 +43,7 @@ export default function ViewStudent() {
   useEffect(() => {
     const fetchStudent = async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/students/${id}/`, {
+        const res = await fetch(`${API_BASE}/api/students/${id}/`, {
           headers: { ...getAuthHeader() },
         });
         if (res.ok) {
@@ -62,7 +63,7 @@ export default function ViewStudent() {
   const handleDelete = async () => {
     if (!window.confirm(`Are you sure you want to delete ${student?.full_name}?`)) return;
     try {
-      await fetch(`http://127.0.0.1:8000/api/students/${id}/`, {
+      await fetch(`${API_BASE}/api/students/${id}/`, {
         method: 'DELETE',
         headers: { ...getAuthHeader() },
       });

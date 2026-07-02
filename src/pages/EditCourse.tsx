@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, apiFetch } from '../utils/auth';
 import AvatarCircle from '../components/AvatarCircle';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const roleLabel: Record<string, string> = {
   admin: 'Super Admin', teacher: 'Faculty Member', parent: 'Parent',
@@ -49,7 +50,7 @@ export default function EditCourse() {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const res = await apiFetch(`http://127.0.0.1:8000/api/courses/${id}/`);
+        const res = await apiFetch(`${API_BASE}/api/courses/${id}/`);
         if (res.ok) {
           const data = await res.json();
           setCourseTitle(data.course_name || '');
@@ -127,7 +128,7 @@ export default function EditCourse() {
 
       console.log('Sending payload:', payload); // debug
 
-      const res = await apiFetch(`http://127.0.0.1:8000/api/courses/${id}/`, {
+      const res = await apiFetch(`${API_BASE}/api/courses/${id}/`, {
         method:  'PUT',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(payload),

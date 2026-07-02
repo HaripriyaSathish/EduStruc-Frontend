@@ -9,6 +9,7 @@ import {
 import { getSession, logoutUser, apiFetch } from '../../utils/auth';
 import AvatarCircle from '../../components/AvatarCircle';
 import communityImg from '../../assets/Educator_community.png';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 interface SupportTicket {
   id:                number;
@@ -54,7 +55,7 @@ export default function TeacherSupport() {
   const fetchTickets = async () => {
     setLoadingTickets(true);
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/support-tickets/');
+      const res = await apiFetch(`${API_BASE}/api/support-tickets/`);
       if (res.ok) setMyTickets(await res.json());
     } catch (e) {
       console.error('Ticket fetch error:', e);
@@ -71,7 +72,7 @@ export default function TeacherSupport() {
     if (!description.trim()) { setSubmitErr('Please describe your issue.'); return; }
     setSubmitting(true);
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/support-tickets/', {
+      const res = await apiFetch(`${API_BASE}/api/support-tickets/`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, apiFetch } from '../../utils/auth';
 import AvatarCircle from '../../components/AvatarCircle';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 interface FormData {
   course_name: string; course_code: string; department: string;
@@ -32,7 +33,7 @@ export default function TeacherEditClass() {
   useEffect(() => {
     const fetch_ = async () => {
       try {
-        const res = await apiFetch(`http://127.0.0.1:8000/api/courses/${id}/`);
+        const res = await apiFetch(`${API_BASE}/api/courses/${id}/`);
         if (res.ok) {
           const d = await res.json();
           setForm({
@@ -59,7 +60,7 @@ export default function TeacherEditClass() {
     if (!form.course_name || !form.course_code) { setError('Class name and code are required.'); return; }
     setSaving(true);
     try {
-      const res = await apiFetch(`http://127.0.0.1:8000/api/courses/${id}/`, {
+      const res = await apiFetch(`${API_BASE}/api/courses/${id}/`, {
         method:  'PUT',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({

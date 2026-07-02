@@ -7,6 +7,7 @@ import {
   Plus, HelpCircle, LogOut, GraduationCap, Camera
 } from 'lucide-react';
 import { getSession, logoutUser, apiFetch } from '../../utils/auth';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 interface TeacherLayoutProps {
   children: React.ReactNode;
@@ -33,7 +34,7 @@ export default function TeacherLayout({ children, title, subtitle, headerRight }
     // Then fetch from API for latest
     const fetchProfile = async () => {
       try {
-        const res = await apiFetch('http://127.0.0.1:8000/api/auth/profile/');
+        const res = await apiFetch(`${API_BASE}/api/auth/profile/`);
         if (res.ok) {
           const data = await res.json();
           if (data.avatar_url) {
@@ -78,7 +79,7 @@ export default function TeacherLayout({ children, title, subtitle, headerRight }
     try {
       const fd = new FormData();
       fd.append('avatar', file);
-      const res = await apiFetch('http://127.0.0.1:8000/api/auth/avatar/', { method: 'POST', body: fd });
+      const res = await apiFetch(`${API_BASE}/api/auth/avatar/`, { method: 'POST', body: fd });
       if (res.ok) {
         const data = await res.json();
         const url  = data.avatar_url || localUrl;

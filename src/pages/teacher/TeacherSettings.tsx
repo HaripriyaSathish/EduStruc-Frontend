@@ -7,6 +7,7 @@ import {
   Check, X, Eye, EyeOff, Clock
 } from 'lucide-react';
 import { getSession, logoutUser, apiFetch } from '../../utils/auth';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 interface UserProfile {
   full_name: string; email: string; job_title: string;
@@ -58,7 +59,7 @@ export default function TeacherSettings() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await apiFetch('http://127.0.0.1:8000/api/auth/profile/');
+        const res = await apiFetch(`${API_BASE}/api/auth/profile/`);
         if (res.ok) {
           const data = await res.json();
           setProfile({
@@ -95,7 +96,7 @@ export default function TeacherSettings() {
     const fd = new FormData();
     fd.append('avatar', file);
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/auth/avatar/', { method: 'POST', body: fd });
+      const res = await apiFetch(`${API_BASE}/api/auth/avatar/`, { method: 'POST', body: fd });
       if (res.ok) {
         const data = await res.json();
         const url  = data.avatar_url || localUrl;
@@ -112,7 +113,7 @@ export default function TeacherSettings() {
     if (!profile.full_name || !profile.email) { setSaveErr('Full name and email are required.'); return; }
     setSaving(true);
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/auth/profile/', {
+      const res = await apiFetch(`${API_BASE}/api/auth/profile/`, {
         method:  'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ full_name: profile.full_name, email: profile.email, job_title: profile.job_title, phone: profile.phone, timezone: profile.timezone }),
@@ -137,7 +138,7 @@ export default function TeacherSettings() {
     if (pwForm.newPw !== pwForm.confirm) { setPwErr('Passwords do not match.'); return; }
     setPwSaving(true);
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/auth/change-password/', {
+      const res = await apiFetch(`${API_BASE}/api/auth/change-password/`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ current_password: pwForm.current, new_password: pwForm.newPw }),
@@ -158,7 +159,7 @@ export default function TeacherSettings() {
   const handleToggle2FA = async () => {
     setTwoFASaving(true); setTwoFAMsg('');
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/auth/toggle-2fa/', { method: 'POST' });
+      const res = await apiFetch(`${API_BASE}/api/auth/toggle-2fa/`, { method: 'POST' });
       if (res.ok) {
         const d = await res.json();
         setTwoFA(d.two_fa_enabled);
@@ -173,7 +174,7 @@ export default function TeacherSettings() {
   const handleDeactivate = async () => {
     setDeactivating(true);
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/auth/deactivate/', { method: 'POST' });
+      const res = await apiFetch(`${API_BASE}/api/auth/deactivate/`, { method: 'POST' });
       if (res.ok) { logoutUser(); navigate('/teacher/logged-out'); }
     } catch { console.error('Deactivate failed'); }
     finally { setDeactivating(false); }

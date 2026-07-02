@@ -39,8 +39,8 @@ export default function Reports() {
       setLoading(true);
       try {
         const [cRes, sRes] = await Promise.all([
-          apiFetch('http://127.0.0.1:8000/api/courses/'),
-          apiFetch('http://127.0.0.1:8000/api/students/'),
+          apiFetch(`${API_BASE}/api/courses/`),
+          apiFetch(`${API_BASE}/api/students/`),
         ]);
         if (cRes.ok)  setCourses(await cRes.json());
         if (sRes.ok) setStudents(await sRes.json());

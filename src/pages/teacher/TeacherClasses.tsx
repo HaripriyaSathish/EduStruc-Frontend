@@ -9,6 +9,8 @@ import {
 import { getSession, logoutUser, apiFetch } from '../../utils/auth';
 import AvatarCircle from '../../components/AvatarCircle';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 interface Course {
   id: number; course_name: string; course_code: string;
   instructor: string; max_students: number; status: string;
@@ -49,9 +51,9 @@ export default function TeacherClasses() {
       setLoading(true);
       try {
         const [cRes, sRes, stRes] = await Promise.all([
-          apiFetch('http://127.0.0.1:8000/api/courses/'),
-          apiFetch('http://127.0.0.1:8000/api/schedules/'),
-          apiFetch('http://127.0.0.1:8000/api/students/'),
+          apiFetch(`${API_BASE}/api/courses/`),
+          apiFetch(`${API_BASE}/api/schedules/`),
+          apiFetch(`${API_BASE}/api/students/`),
         ]);
         if (cRes.ok)  setCourses(await cRes.json());
         if (sRes.ok)  setSchedules(await sRes.json());

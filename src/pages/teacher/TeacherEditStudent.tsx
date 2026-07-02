@@ -8,6 +8,7 @@ import {
 import { getSession, logoutUser, apiFetch } from '../../utils/auth';
 import AvatarCircle from '../../components/AvatarCircle';
 import StudentAvatarUpload from '../../components/StudentAvatarUpload';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 interface FormData {
   full_name: string; date_of_birth: string; gender: string;
@@ -40,7 +41,7 @@ export default function TeacherEditStudent() {
   useEffect(() => {
     const fetch_ = async () => {
       try {
-        const res = await apiFetch(`http://127.0.0.1:8000/api/students/${id}/`);
+        const res = await apiFetch(`${API_BASE}/api/students/${id}/`);
         if (res.ok) {
           const data = await res.json();
           setForm({
@@ -83,7 +84,7 @@ export default function TeacherEditStudent() {
     }
     setSaving(true);
     try {
-      const res = await apiFetch(`http://127.0.0.1:8000/api/students/${id}/`, {
+      const res = await apiFetch(`${API_BASE}/api/students/${id}/`, {
         method:  'PUT',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(form),

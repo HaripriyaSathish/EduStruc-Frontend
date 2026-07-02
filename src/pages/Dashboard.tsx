@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, getAuthHeader, apiFetch } from '../utils/auth';
 import AvatarCircle from '../components/AvatarCircle';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 interface Stats {
   total_students:   number;
@@ -85,7 +86,7 @@ export default function Dashboard() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/notifications/');
+      const res = await apiFetch(`${API_BASE}/api/notifications/`);
       if (res.ok) {
         const data = await res.json();
         setNotifications(data.results);
@@ -108,7 +109,7 @@ export default function Dashboard() {
   const handleNotifClick = async (n: NotificationItem) => {
     if (!n.is_read) {
       try {
-        await apiFetch(`http://127.0.0.1:8000/api/notifications/${n.id}/read/`, { method: 'POST' });
+        await apiFetch(`${API_BASE}/api/notifications/${n.id}/read/`, { method: 'POST' });
         setNotifications(prev => prev.map(p => p.id === n.id ? { ...p, is_read: true } : p));
         setUnreadCount(prev => Math.max(0, prev - 1));
       } catch (e) { console.error(e); }
@@ -119,7 +120,7 @@ export default function Dashboard() {
 
   const handleMarkAllRead = async () => {
     try {
-      await apiFetch('http://127.0.0.1:8000/api/notifications/read-all/', { method: 'POST' });
+      await apiFetch(`${API_BASE}/api/notifications/read-all/`, { method: 'POST' });
       setNotifications(prev => prev.map(p => ({ ...p, is_read: true })));
       setUnreadCount(0);
     } catch (e) { console.error(e); }
@@ -129,7 +130,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/students/stats/', {
+        const res = await fetch(`${API_BASE}/api/students/stats/`, {
           headers: { ...getAuthHeader() },
         });
         if (res.ok) setStats(await res.json());

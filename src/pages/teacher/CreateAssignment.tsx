@@ -36,7 +36,7 @@ export default function CreateAssignment() {
   });
 
   useEffect(() => {
-    apiFetch('http://127.0.0.1:8000/api/courses/')
+    apiFetch(`${API_BASE}/api/courses/`)
       .then(r => r.ok ? r.json() : [])
       .then(setCourses)
       .catch(console.error);

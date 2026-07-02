@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, getAuthHeader } from '../utils/auth';
 import AvatarCircle from '../components/AvatarCircle';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const roleLabel: Record<string, string> = {
   admin: 'Super Admin', teacher: 'Faculty Member', parent: 'Parent',
@@ -77,7 +78,7 @@ export default function CreateStudent() {
         parent_name:      form.parent_name,
         parent_phone:     form.parent_phone,
       };
-      const res = await fetch('http://127.0.0.1:8000/api/students/', {
+      const res = await fetch(`${API_BASE}/api/students/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
         body: JSON.stringify(payload),

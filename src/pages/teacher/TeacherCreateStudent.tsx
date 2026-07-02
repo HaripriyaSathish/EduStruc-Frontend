@@ -8,6 +8,8 @@ import {
 import { getSession, logoutUser, apiFetch } from '../../utils/auth';
 import AvatarCircle from '../../components/AvatarCircle';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 interface Course {
   id: number; course_name: string; course_code: string;
   max_students: number; semester: string; department: string;
@@ -43,7 +45,7 @@ export default function TeacherCreateStudent() {
   });
 
   useEffect(() => {
-    apiFetch('http://127.0.0.1:8000/api/courses/')
+    apiFetch(`${API_BASE}/api/courses/`)
       .then(r => r.ok ? r.json() : [])
       .then(data => {
         setCourses(data);
@@ -84,7 +86,7 @@ export default function TeacherCreateStudent() {
         gender:       'O',
       };
 
-      const res = await apiFetch('http://127.0.0.1:8000/api/students/', {
+      const res = await apiFetch(`${API_BASE}/api/students/`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(payload),

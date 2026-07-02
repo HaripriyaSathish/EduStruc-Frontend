@@ -4,6 +4,8 @@ import { Download, FilePlus, Calendar, Bell, Users2, BookOpen, MessageSquare, Bo
 import TeacherLayout from '../../components/teacher/TeacherLayout';
 import { getSession, apiFetch } from '../../utils/auth';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 interface Schedule { id: number; course_name: string; day: string; start_time: string; end_time: string; room: string; }
 interface Course   { id: number; course_name: string; course_code: string; instructor: string; max_students: number; status: string; department: string; }
 interface Student  { id: number; full_name: string; status: string; }
@@ -28,9 +30,9 @@ export default function TeacherDashboard() {
       setLoading(true);
       try {
         const [sRes, cRes, stRes] = await Promise.all([
-          apiFetch('http://127.0.0.1:8000/api/schedules/'),
-          apiFetch('http://127.0.0.1:8000/api/courses/'),
-          apiFetch('http://127.0.0.1:8000/api/students/'),
+          apiFetch(`${API_BASE}/api/schedules/`),
+          apiFetch(`${API_BASE}/api/courses/`),
+          apiFetch(`${API_BASE}/api/students/`),
         ]);
         if (sRes.ok) {
           const all: Schedule[] = await sRes.json();

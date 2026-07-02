@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, apiFetch } from '../../utils/auth';
 import AvatarCircle from '../../components/AvatarCircle';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 interface Course {
   id: number; course_name: string; course_code: string;
@@ -63,8 +64,8 @@ export default function TeacherViewClass() {
       setLoading(true);
       try {
         const [cRes, sRes] = await Promise.all([
-          apiFetch(`http://127.0.0.1:8000/api/courses/${id}/`),
-          apiFetch('http://127.0.0.1:8000/api/students/'),
+          apiFetch(`${API_BASE}/api/courses/${id}/`),
+          apiFetch(`${API_BASE}/api/students/`),
         ]);
         if (cRes.ok) setCourse(await cRes.json());
         else setError('Course not found.');

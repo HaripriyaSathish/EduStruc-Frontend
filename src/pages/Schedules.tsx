@@ -76,7 +76,7 @@ export default function Schedules() {
     const fetch_ = async () => {
       setLoading(true);
       try {
-        const res = await apiFetch('http://127.0.0.1:8000/api/schedules/');
+        const res = await apiFetch(`${API_BASE}/api/schedules/`);
         if (res.ok) setSchedules(await res.json());
       } catch (e) { console.error(e); }
       finally { setLoading(false); }

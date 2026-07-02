@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, apiFetch } from '../utils/auth';
 import AvatarCircle from '../components/AvatarCircle';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const roleLabel: Record<string, string> = {
   admin: 'Super Admin', teacher: 'Faculty Member', parent: 'Parent',
@@ -43,7 +44,7 @@ export default function CreateSchedule() {
     }
     setLoading(true);
     try {
-      const res = await apiFetch('http://127.0.0.1:8000/api/schedules/', {
+      const res = await apiFetch(`${API_BASE}/api/schedules/`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(form),

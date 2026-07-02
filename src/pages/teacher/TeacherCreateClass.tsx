@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, apiFetch } from '../../utils/auth';
 import AvatarCircle from '../../components/AvatarCircle';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 interface Course { id: number; course_name: string; department: string; max_students: number; }
 
@@ -41,7 +42,7 @@ export default function TeacherCreateClass() {
 
   // Load existing courses to show department capacity
   useEffect(() => {
-    apiFetch('http://127.0.0.1:8000/api/courses/')
+    apiFetch(`${API_BASE}/api/courses/`)
       .then(r => r.ok ? r.json() : [])
       .then(setCourses)
       .catch(console.error);
@@ -81,7 +82,7 @@ export default function TeacherCreateClass() {
         description:  form.description.trim(),
       };
 
-      const res = await apiFetch('http://127.0.0.1:8000/api/courses/', {
+      const res = await apiFetch(`${API_BASE}/api/courses/`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(payload),

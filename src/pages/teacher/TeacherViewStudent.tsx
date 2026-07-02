@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, apiFetch } from '../../utils/auth';
 import AvatarCircle from '../../components/AvatarCircle';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 interface Student {
   id: number; roll_number: string; full_name: string; email: string;
@@ -39,7 +40,7 @@ export default function TeacherViewStudent() {
   useEffect(() => {
     const fetch_ = async () => {
       try {
-        const res = await apiFetch(`http://127.0.0.1:8000/api/students/${id}/`);
+        const res = await apiFetch(`${API_BASE}/api/students/${id}/`);
         if (res.ok) setStudent(await res.json());
         else setError('Student not found.');
       } catch { setError('Cannot connect to server.'); }
@@ -50,7 +51,7 @@ export default function TeacherViewStudent() {
 
   const handleDelete = async () => {
     if (!window.confirm(`Delete ${student?.full_name}?`)) return;
-    await apiFetch(`http://127.0.0.1:8000/api/students/${id}/`, { method: 'DELETE' });
+    await apiFetch(`${API_BASE}/api/students/${id}/`, { method: 'DELETE' });
     navigate('/teacher/students');
   };
 
