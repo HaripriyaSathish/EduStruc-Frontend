@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { BarChart3, Calendar, TrendingUp, CheckCircle, GraduationCap, Building2, BookOpen, FlaskConical } from 'lucide-react';
+import dashboardPreview from '../assets/dashboard-preview.png';
 
 export default function Landing() {
   return (
@@ -105,7 +106,7 @@ export default function Landing() {
     <div style={{ borderRadius: '20px', overflow: 'hidden', boxShadow: '0 40px 80px rgba(0,81,213,0.25)', position: 'relative' }}>
       {/* Real dashboard image */}
       <img
-        src="/src/assets/dashboard-preview.png"
+        src={dashboardPreview}
         alt="EduStruc Dashboard"
         style={{ width: '100%', display: 'block', borderRadius: '16px 16px 0 0' }}
       />
