@@ -8,6 +8,9 @@ import {
 } from 'lucide-react';
 import { getSession, logoutUser, apiFetch } from '../utils/auth';
 import AvatarCircle from '../components/AvatarCircle';
+import communityImg from '../assets/community.png';
+
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const roleLabel: Record<string, string> = {
   admin: 'Super Admin', teacher: 'Faculty Member', parent: 'Parent',
@@ -444,13 +447,14 @@ export default function HelpSupport() {
                   <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '15px', color: '#0B1C30', margin: '0 0 12px' }}>Community Support</h3>
                 </div>
                 {/* Community image */}
-                <img src="/src/assets/community.png" alt="Community"
+                <img src={communityImg} alt="Community"
                   style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }} />
                 <div style={{ padding: '14px 16px 16px' }}>
                   <p style={{ fontSize: '13px', color: '#45464D', margin: '0 0 14px', lineHeight: 1.6 }}>
                     Join our administrator community to share tips and best practices with other EduStruc users.
                   </p>
                   <button className="forum-btn"
+                    onClick={() => alert('Community forum coming soon!')}
                     style={{ width: '100%', background: '#0051D5', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s ease' }}>
                     Visit Forum
                   </button>
