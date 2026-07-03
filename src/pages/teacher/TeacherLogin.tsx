@@ -101,9 +101,9 @@ export default function TeacherLogin() {
               <label style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: '11px', color: '#45464D', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 Password
               </label>
-              <a href="#" className="forgot-link" style={{ fontSize: '12px', color: '#0051D5', textDecoration: 'none', fontWeight: 500, transition: 'color 0.15s ease' }}>
-                Forgot?
-              </a>
+              <Link to="/teacher/forgot-password" className="forgot-link" style={{ fontSize: '12px', color: '#0051D5', textDecoration: 'none', fontWeight: 500, transition: 'color 0.15s ease' }}>
+                 Forgot?
+               </Link>
             </div>
             <div style={{ position: 'relative' }}>
               <Lock size={14} style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: '#C6C6CD' }} />

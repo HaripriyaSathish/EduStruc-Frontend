@@ -20,6 +20,8 @@ import CreateSchedule        from './pages/CreateSchedule';
 import SystemSettings        from './pages/SystemSettings';
 import HelpSupport           from './pages/HelpSupport';
 import TeacherLogin          from './pages/teacher/TeacherLogin';
+import TeacherForgotPassword from './pages/teacher/TeacherForgotPassword';
+import TeacherResetPassword  from './pages/teacher/TeacherResetPassword';
 import TeacherDashboard      from './pages/teacher/TeacherDashboard';
 import ExportReports         from './pages/teacher/ExportReports';
 import CreateAssignment      from './pages/teacher/CreateAssignment';
@@ -69,6 +71,8 @@ function App() {
         <Route path="/support"           element={<ProtectedRoute allowedRoles={['admin']}><HelpSupport /></ProtectedRoute>} />
         <Route path="/reports"           element={<ProtectedRoute allowedRoles={['admin']}><Reports /></ProtectedRoute>} />
         <Route path="/teacher/login"             element={<TeacherLogin />} />
+        <Route path="/teacher/forgot-password"            element={<TeacherForgotPassword />} />
+        <Route path="/teacher/reset-password/:uid/:token" element={<TeacherResetPassword />} />
         <Route path="/teacher/logged-out"        element={<TeacherLoggedOut />} />
         <Route path="/teacher/dashboard"         element={<ProtectedRoute allowedRoles={['teacher']}><TeacherDashboard /></ProtectedRoute>} />
         <Route path="/teacher/export-reports"    element={<ProtectedRoute allowedRoles={['teacher']}><ExportReports /></ProtectedRoute>} />
