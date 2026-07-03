@@ -28,7 +28,7 @@ export default function TeacherSettings() {
   const [saveErr,     setSaveErr]     = useState('');
 
   // Visual Interface
-  const [darkMode,    setDarkMode]    = useState(false);
+  const [darkMode,    setDarkMode]    = useState(() => localStorage.getItem('edustruc_dark_mode') === 'true');
   const [compactRow,  setCompactRow]  = useState(false);
   const [accentColor, setAccentColor] = useState('#0051D5');
 
@@ -54,6 +54,34 @@ export default function TeacherSettings() {
 
   // Last update timestamp
   const [lastUpdate, setLastUpdate] = useState('');
+
+  // ── Theme (drives dark mode for this page) ────────
+  const theme = darkMode ? {
+    pageBg:    '#0B1220',
+    cardBg:    '#131B2E',
+    border:    '#2A3550',
+    text:      '#F1F5F9',
+    textMuted: '#94A3B8',
+    inputBg:   '#0F172A',
+    headerBg:  '#131B2E',
+  } : {
+    pageBg:    '#F8F9FF',
+    cardBg:    '#FFFFFF',
+    border:    '#C6C6CD',
+    text:      '#0B1C30',
+    textMuted: '#76777D',
+    inputBg:   '#FFFFFF',
+    headerBg:  '#FFFFFF',
+  };
+
+  // ── Toggle + persist dark mode ────────────────────
+  const handleToggleDarkMode = () => {
+    setDarkMode(prev => {
+      const next = !prev;
+      localStorage.setItem('edustruc_dark_mode', String(next));
+      return next;
+    });
+  };
 
   // ── Load profile ─────────────────────────────────
   useEffect(() => {
@@ -189,15 +217,19 @@ export default function TeacherSettings() {
   ];
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '9px 12px', border: '1px solid #C6C6CD',
-    borderRadius: '8px', fontSize: '13px', color: '#45464D',
-    background: '#fff', outline: 'none', boxSizing: 'border-box',
+    width: '100%', padding: '9px 12px', border: `1px solid ${theme.border}`,
+    borderRadius: '8px', fontSize: '13px', color: theme.text,
+    background: theme.inputBg, outline: 'none', boxSizing: 'border-box',
     fontFamily: 'Inter, sans-serif', transition: 'border-color 0.2s ease',
   };
   const labelStyle: React.CSSProperties = {
-    fontSize: '11px', fontWeight: 500, color: '#45464D',
+    fontSize: '11px', fontWeight: 500, color: theme.textMuted,
     letterSpacing: '0.05em', textTransform: 'uppercase',
     display: 'block', marginBottom: '6px',
+  };
+  const cardStyle: React.CSSProperties = {
+    background: theme.cardBg, border: `1px solid ${theme.border}`,
+    borderRadius: '12px',
   };
 
   const Toggle = ({ on, onToggle, loading }: { on: boolean; onToggle: () => void; loading?: boolean }) => (
@@ -208,7 +240,7 @@ export default function TeacherSettings() {
   );
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#F8F9FF', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: theme.pageBg, fontFamily: 'Inter, sans-serif', transition: 'background 0.2s ease' }}>
 
       <style>{`
         .nav-item { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; }
@@ -222,12 +254,12 @@ export default function TeacherSettings() {
         .save-btn:hover:not(:disabled) { background: #003DAA !important; transform: translateY(-1px); }
         .save-btn:disabled { opacity: 0.7; cursor: not-allowed; }
         .discard-btn:hover { background: #F0F4FF !important; border-color: #0051D5 !important; color: #0051D5 !important; }
-        .pw-btn:hover { background: #F0F4FF !important; }
+        .pw-btn:hover { filter: brightness(0.97); }
         .deact-btn:hover { background: #FEE2E2 !important; border-color: #DC2626 !important; }
         .photo-wrap:hover .photo-overlay { opacity: 1 !important; }
         .color-swatch:hover { transform: scale(1.15); }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; display: flex; align-items: center; justify-content: center; }
-        .modal-box { background: #fff; border-radius: '16px'; padding: 28px; width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: fadeIn 0.2s ease; }
+        .modal-box { border-radius: 16px; padding: 28px; width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: fadeIn 0.2s ease; }
         @keyframes fadeIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
@@ -269,15 +301,15 @@ export default function TeacherSettings() {
       <div style={{ marginLeft: '240px', flex: 1, display: 'flex', flexDirection: 'column' }}>
 
         {/* Header */}
-        <header style={{ background: '#fff', borderBottom: '1px solid #C6C6CD', padding: '0 28px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
+        <header style={{ background: theme.headerBg, borderBottom: `1px solid ${theme.border}`, padding: '0 28px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30, transition: 'background 0.2s ease' }}>
           <div>
-            <h1 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '20px', color: '#0B1C30', margin: 0 }}>System Settings</h1>
-            <p style={{ fontSize: '12px', color: '#76777D', margin: 0 }}>Manage your administrative profile, institution details, and system preferences.</p>
+            <h1 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '20px', color: theme.text, margin: 0 }}>System Settings</h1>
+            <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0 }}>Manage your administrative profile, institution details, and system preferences.</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontWeight: 600, fontSize: '13px', color: '#0B1C30', margin: 0 }}>{profile.full_name || user?.full_name || 'Teacher'}</p>
-              <p style={{ fontSize: '11px', color: '#76777D', margin: 0 }}>Teacher</p>
+              <p style={{ fontWeight: 600, fontSize: '13px', color: theme.text, margin: 0 }}>{profile.full_name || user?.full_name || 'Teacher'}</p>
+              <p style={{ fontSize: '11px', color: theme.textMuted, margin: 0 }}>Teacher</p>
             </div>
             {/* Avatar shown in header */}
             <div onClick={() => photoRef.current?.click()}
@@ -296,11 +328,11 @@ export default function TeacherSettings() {
         <main style={{ padding: '28px 32px', flex: 1 }}>
 
           {/* ── PORTAL SETTINGS ───────────────────── */}
-          <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '28px', marginBottom: '20px' }}>
+          <div style={{ ...cardStyle, padding: '28px', marginBottom: '20px', transition: 'background 0.2s ease, border-color 0.2s ease' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px' }}>
               <div>
-                <h2 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '20px', color: '#0B1C30', margin: '0 0 4px' }}>Portal Settings</h2>
-                <p style={{ fontSize: '13px', color: '#76777D', margin: 0 }}>Manage your professional profile, notification triggers, and the aesthetic layout of your academic dashboard.</p>
+                <h2 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '20px', color: theme.text, margin: '0 0 4px' }}>Portal Settings</h2>
+                <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>Manage your professional profile, notification triggers, and the aesthetic layout of your academic dashboard.</p>
               </div>
               <button className="save-btn" onClick={handleSaveProfile} disabled={saving}
                 style={{ background: '#0051D5', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 20px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s ease', flexShrink: 0 }}>
@@ -321,7 +353,7 @@ export default function TeacherSettings() {
                 {/* Avatar row */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
                   <div className="photo-wrap" onClick={() => photoRef.current?.click()}
-                    style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#DCE9FF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', position: 'relative', flexShrink: 0, border: '3px solid #EFF4FF' }}>
+                    style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#DCE9FF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', position: 'relative', flexShrink: 0, border: `3px solid ${theme.cardBg}` }}>
                     {avatarUrl
                       ? <img src={avatarUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       : <span style={{ fontSize: '24px', fontWeight: 700, color: '#0051D5' }}>{(profile.full_name || 'T').charAt(0).toUpperCase()}</span>}
@@ -331,8 +363,8 @@ export default function TeacherSettings() {
                   </div>
                   <input ref={photoRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} />
                   <div>
-                    <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '15px', color: '#0B1C30', margin: '0 0 4px' }}>{profile.full_name || 'Your Name'}</p>
-                    <p style={{ fontSize: '12px', color: '#76777D', margin: '0 0 8px' }}>Click photo to upload a new picture</p>
+                    <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '15px', color: theme.text, margin: '0 0 4px' }}>{profile.full_name || 'Your Name'}</p>
+                    <p style={{ fontSize: '12px', color: theme.textMuted, margin: '0 0 8px' }}>Click photo to upload a new picture</p>
                     <button onClick={() => photoRef.current?.click()}
                       style={{ background: '#EFF4FF', border: '1px solid #DCE9FF', color: '#0051D5', borderRadius: '6px', padding: '5px 12px', fontSize: '12px', fontWeight: 500, cursor: 'pointer' }}>
                       Change Photo
@@ -367,17 +399,17 @@ export default function TeacherSettings() {
                 </div>
               </div>
 
-              {/* Right — Visual Interface dark card */}
+              {/* Right — Visual Interface dark card (this actually drives the page theme now) */}
               <div style={{ background: '#0B1C30', borderRadius: '12px', padding: '20px' }}>
                 <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '14px', color: '#fff', margin: '0 0 8px' }}>Visual Interface</p>
                 <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', margin: '0 0 20px', lineHeight: 1.5 }}>
                   Customize your portal density and color scheme to reduce eye strain during long grading sessions.
                 </p>
 
-                {/* Dark Mode */}
+                {/* Dark Mode — now functional */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                   <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>Dark Mode</span>
-                  <Toggle on={darkMode} onToggle={() => setDarkMode(d => !d)} />
+                  <Toggle on={darkMode} onToggle={handleToggleDarkMode} />
                 </div>
 
                 {/* Compact Row Density */}
@@ -402,11 +434,11 @@ export default function TeacherSettings() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
 
             {/* Notification Triggers */}
-            <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '24px' }}>
+            <div style={{ ...cardStyle, padding: '24px', transition: 'background 0.2s ease, border-color 0.2s ease' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Bell size={16} color="#0051D5" />
-                  <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '15px', color: '#0B1C30', margin: 0 }}>Notification Triggers</h3>
+                  <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '15px', color: theme.text, margin: 0 }}>Notification Triggers</h3>
                 </div>
                 <span style={{ background: '#DCFCE7', color: '#059669', fontSize: '11px', fontWeight: 600, padding: '3px 8px', borderRadius: '999px' }}>
                   {Object.values(notif).filter(Boolean).length * 3} Subscriptions Active
@@ -417,14 +449,14 @@ export default function TeacherSettings() {
                 { key: 'messages',   icon: '💬', color: '#DCFCE7',  label: 'Student Direct Messages', desc: 'Instant push notifications for urgent academic queries.' },
                 { key: 'system',    icon: '⚙',  color: '#F0F4FF',  label: 'System & Curriculum Updates', desc: 'Stay informed about portal maintenance and school news.' },
               ].map(item => (
-                <div key={item.key} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #F0F4FF' }}>
+                <div key={item.key} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '12px 0', borderBottom: `1px solid ${theme.border}` }}>
                   <div style={{ display: 'flex', gap: '12px', flex: 1 }}>
                     <div style={{ background: item.color, borderRadius: '8px', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', flexShrink: 0 }}>
                       {item.icon}
                     </div>
                     <div>
-                      <p style={{ fontWeight: 600, fontSize: '13px', color: '#0B1C30', margin: '0 0 2px' }}>{item.label}</p>
-                      <p style={{ fontSize: '12px', color: '#76777D', margin: 0 }}>{item.desc}</p>
+                      <p style={{ fontWeight: 600, fontSize: '13px', color: theme.text, margin: '0 0 2px' }}>{item.label}</p>
+                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0 }}>{item.desc}</p>
                     </div>
                   </div>
                   <input type="checkbox"
@@ -436,32 +468,32 @@ export default function TeacherSettings() {
             </div>
 
             {/* Security Context */}
-            <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '24px' }}>
+            <div style={{ ...cardStyle, padding: '24px', transition: 'background 0.2s ease, border-color 0.2s ease' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
                 <Shield size={16} color="#0051D5" />
-                <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '15px', color: '#0B1C30', margin: 0 }}>Security Context</h3>
+                <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '15px', color: theme.text, margin: 0 }}>Security Context</h3>
               </div>
 
               {/* Change Password */}
               <button className="pw-btn" onClick={() => { setPwModal(true); setPwErr(''); setPwMsg(''); }}
-                style={{ width: '100%', background: '#F8F9FF', border: '1px solid #C6C6CD', borderRadius: '10px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: '12px', transition: 'all 0.2s ease' }}>
+                style={{ width: '100%', background: theme.inputBg, border: `1px solid ${theme.border}`, borderRadius: '10px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', marginBottom: '12px', transition: 'all 0.2s ease' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ background: '#DCE9FF', borderRadius: '6px', padding: '6px', display: 'flex' }}>
                     <Shield size={14} color="#0051D5" />
                   </div>
-                  <span style={{ fontSize: '14px', fontWeight: 500, color: '#0B1C30' }}>Change Portal Password</span>
+                  <span style={{ fontSize: '14px', fontWeight: 500, color: theme.text }}>Change Portal Password</span>
                 </div>
-                <ChevronRight size={16} color="#76777D" />
+                <ChevronRight size={16} color={theme.textMuted} />
               </button>
 
               {/* 2FA */}
-              <div style={{ background: '#F8F9FF', border: '1px solid #C6C6CD', borderRadius: '10px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ background: theme.inputBg, border: `1px solid ${theme.border}`, borderRadius: '10px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ background: twoFA ? '#DCFCE7' : '#F0F4FF', borderRadius: '6px', padding: '6px', display: 'flex' }}>
                     <Shield size={14} color={twoFA ? '#059669' : '#0051D5'} />
                   </div>
                   <div>
-                    <span style={{ fontSize: '14px', fontWeight: 500, color: '#0B1C30' }}>Two-Factor Auth (2FA)</span>
+                    <span style={{ fontSize: '14px', fontWeight: 500, color: theme.text }}>Two-Factor Auth (2FA)</span>
                     {twoFAMsg && <p style={{ fontSize: '11px', color: '#059669', margin: '2px 0 0' }}>{twoFAMsg}</p>}
                   </div>
                 </div>
@@ -474,12 +506,12 @@ export default function TeacherSettings() {
               </div>
 
               {/* Dangerous Action */}
-              <div style={{ background: '#FFF5F5', border: '1px solid #FECACA', borderRadius: '10px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ background: darkMode ? '#2A1214' : '#FFF5F5', border: '1px solid #FECACA', borderRadius: '10px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <AlertTriangle size={16} color="#DC2626" />
                   <div>
                     <p style={{ fontWeight: 600, fontSize: '13px', color: '#DC2626', margin: '0 0 2px' }}>Dangerous Action</p>
-                    <p style={{ fontSize: '12px', color: '#76777D', margin: 0 }}>Delete Academic Portal Account</p>
+                    <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0 }}>Delete Academic Portal Account</p>
                   </div>
                 </div>
                 <button onClick={() => setDeactivateModal(true)}
@@ -491,8 +523,8 @@ export default function TeacherSettings() {
           </div>
 
           {/* ── LAST UPDATE + ACTION BUTTONS ─────── */}
-          <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '16px 24px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#76777D' }}>
+          <div style={{ ...cardStyle, padding: '16px 24px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'background 0.2s ease, border-color 0.2s ease' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: theme.textMuted }}>
               <Clock size={14} />
               <span style={{ fontSize: '12px' }}>
                 Last account update: {lastUpdate ? new Date(lastUpdate).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Never'}
@@ -500,7 +532,7 @@ export default function TeacherSettings() {
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button className="discard-btn" onClick={() => window.location.reload()}
-                style={{ background: '#fff', border: '1px solid #C6C6CD', color: '#45464D', borderRadius: '8px', padding: '9px 20px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s ease' }}>
+                style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: '8px', padding: '9px 20px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s ease' }}>
                 Discard
               </button>
               <button className="save-btn" onClick={handleSaveProfile} disabled={saving}
@@ -511,23 +543,23 @@ export default function TeacherSettings() {
           </div>
 
           {/* ── ACCOUNT SECURITY MANAGEMENT ──────── */}
-          <div style={{ background: '#fff', border: '1px solid #FECACA', borderRadius: '12px', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ background: theme.cardBg, border: '1px solid #FECACA', borderRadius: '12px', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'background 0.2s ease' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <AlertTriangle size={20} color="#DC2626" />
               <div>
-                <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '14px', color: '#0B1C30', margin: '0 0 2px' }}>Account Security Management</p>
-                <p style={{ fontSize: '13px', color: '#76777D', margin: 0 }}>Manage higher-risk account permissions or deactivate administrative access.</p>
+                <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '14px', color: theme.text, margin: '0 0 2px' }}>Account Security Management</p>
+                <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>Manage higher-risk account permissions or deactivate administrative access.</p>
               </div>
             </div>
             <button className="deact-btn" onClick={() => setDeactivateModal(true)}
-              style={{ background: '#fff', border: '1px solid #DC2626', color: '#DC2626', borderRadius: '8px', padding: '9px 20px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s ease' }}>
+              style={{ background: theme.cardBg, border: '1px solid #DC2626', color: '#DC2626', borderRadius: '8px', padding: '9px 20px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s ease' }}>
               Deactivate Portal
             </button>
           </div>
         </main>
 
-        <footer style={{ background: '#D3E4FE', borderTop: '1px solid #C6C6CD', padding: '14px 48px', textAlign: 'center' }}>
-          <p style={{ fontSize: '13px', color: '#45464D', margin: '0 0 2px' }}>© 2024 EduStruc Academic Systems. All rights reserved.</p>
+        <footer style={{ background: darkMode ? '#0F1830' : '#D3E4FE', borderTop: `1px solid ${theme.border}`, padding: '14px 48px', textAlign: 'center', transition: 'background 0.2s ease' }}>
+          <p style={{ fontSize: '13px', color: theme.textMuted, margin: '0 0 2px' }}>© 2024 EduStruc Academic Systems. All rights reserved.</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
             {['Privacy Policy','Terms of Service','Contact Support'].map((l, i) => (
               <a key={i} href="#" style={{ fontSize: '12px', color: '#0051D5', textDecoration: 'none' }}>{l}</a>
@@ -539,10 +571,10 @@ export default function TeacherSettings() {
       {/* ── CHANGE PASSWORD MODAL ───────────────── */}
       {pwModal && (
         <div className="modal-overlay" onClick={() => setPwModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ borderRadius: '16px' }}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ background: theme.cardBg }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '18px', color: '#0B1C30', margin: 0 }}>Change Password</h3>
-              <button onClick={() => setPwModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#76777D' }}><X size={18} /></button>
+              <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '18px', color: theme.text, margin: 0 }}>Change Password</h3>
+              <button onClick={() => setPwModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.textMuted }}><X size={18} /></button>
             </div>
             {pwMsg && <div style={{ background: '#D1FAE5', border: '1px solid #A7F3D0', borderRadius: '8px', padding: '10px', marginBottom: '14px', fontSize: '13px', color: '#059669', display: 'flex', gap: '6px' }}><Check size={14} />{pwMsg}</div>}
             {pwErr && <div style={{ background: '#FEE2E2', border: '1px solid #FECACA', borderRadius: '8px', padding: '10px', marginBottom: '14px', fontSize: '13px', color: '#DC2626', display: 'flex', gap: '6px' }}><X size={14} />{pwErr}</div>}
@@ -561,14 +593,14 @@ export default function TeacherSettings() {
                   ref={f.key === 'current' ? pwRef : undefined}
                   onKeyDown={e => e.key === 'Enter' && handleChangePassword()} />
                 <button onClick={() => setShowPw(p => ({ ...p, [f.key]: !p[f.key as keyof typeof p] }))}
-                  style={{ position: 'absolute', right: '10px', top: '34px', background: 'none', border: 'none', cursor: 'pointer', color: '#C6C6CD', display: 'flex' }}>
+                  style={{ position: 'absolute', right: '10px', top: '34px', background: 'none', border: 'none', cursor: 'pointer', color: theme.textMuted, display: 'flex' }}>
                   {showPw[f.key as keyof typeof showPw] ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             ))}
             <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
               <button onClick={() => setPwModal(false)}
-                style={{ flex: 1, background: '#fff', border: '1px solid #C6C6CD', color: '#45464D', borderRadius: '8px', padding: '10px', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>
+                style={{ flex: 1, background: theme.cardBg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: '8px', padding: '10px', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>
                 Cancel
               </button>
               <button onClick={handleChangePassword} disabled={pwSaving}
@@ -585,19 +617,19 @@ export default function TeacherSettings() {
       {/* ── DEACTIVATE MODAL ────────────────────── */}
       {deactivateModal && (
         <div className="modal-overlay" onClick={() => setDeactivateModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ borderRadius: '16px' }}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ background: theme.cardBg }}>
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
               <div style={{ background: '#FEE2E2', borderRadius: '50%', width: '56px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
                 <AlertTriangle size={24} color="#DC2626" />
               </div>
-              <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '18px', color: '#0B1C30', margin: '0 0 8px' }}>Deactivate Portal Access</h3>
-              <p style={{ fontSize: '13px', color: '#76777D', margin: 0, lineHeight: 1.6 }}>
+              <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '18px', color: theme.text, margin: '0 0 8px' }}>Deactivate Portal Access</h3>
+              <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0, lineHeight: 1.6 }}>
                 This will permanently deactivate your academic portal account. All your class data, grades, and schedules will be archived. This action cannot be undone.
               </p>
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button onClick={() => setDeactivateModal(false)}
-                style={{ flex: 1, background: '#fff', border: '1px solid #C6C6CD', color: '#45464D', borderRadius: '8px', padding: '10px', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>
+                style={{ flex: 1, background: theme.cardBg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: '8px', padding: '10px', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>
                 Cancel
               </button>
               <button onClick={handleDeactivate} disabled={deactivating}
