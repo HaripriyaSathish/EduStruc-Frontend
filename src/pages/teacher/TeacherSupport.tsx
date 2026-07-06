@@ -136,6 +136,7 @@ export default function TeacherSupport() {
         .nav-item-active { background: #316BF3 !important; }
         .sidebar-bottom { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 10px; color: #45464D; font-size: 14px; }
         .sidebar-bottom:hover { background: rgba(49,107,243,0.08); color: #316BF3; }
+        .sidebar-support-active { background: #316BF3 !important; color: #fff !important; border-radius: 8px; }
         .logout-btn:hover { background: rgba(255,80,80,0.2) !important; }
         .add-btn-side:hover { background: #003DAA !important; }
         .guide-card { transition: all 0.2s ease; cursor: pointer; border: 1px solid #E5E7EB; border-radius: 10px; padding: 16px; }
@@ -182,9 +183,9 @@ export default function TeacherSupport() {
           </button>
         </nav>
         <div style={{ borderTop: '1px solid #C6C6CD', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          <div className="sidebar-bottom" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff' }}>
-            <HelpCircle size={15} /> Support
-          </div>
+          <div className="sidebar-bottom sidebar-support-active" style={{ color: '#fff', fontWeight: 600 }}>
+  <HelpCircle size={15} /> Support
+</div>
           <div className="sidebar-bottom logout-btn" onClick={() => { logoutUser(); navigate('/teacher/logged-out'); }}>
             <LogOut size={15} /> Logout
           </div>
