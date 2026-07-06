@@ -220,9 +220,10 @@ export default function Dashboard() {
     },
   ];
 
-  const navItems = [
+ const navItems = [
   { icon: <LayoutDashboard size={16} />, label: 'Dashboard',  path: '/dashboard' },
   { icon: <Users size={16} />,           label: 'Students',   path: '/students' },
+  { icon: <GraduationCap size={16} />,   label: 'Teachers',   path: '/teachers' },
   { icon: <BookOpen size={16} />,        label: 'Courses',    path: '/courses' },
   { icon: <Calendar size={16} />,        label: 'Schedules',  path: '/schedules' },
   { icon: <ClipboardList size={16} />,   label: 'Attendance', path: '/attendance/bulk' },
@@ -241,13 +242,13 @@ export default function Dashboard() {
   ];
 
   const perfData = [
-    { label: 'Eng',  h: 55, color: '#C7D7F8' },
-    { label: 'Math', h: 68, color: '#A8BEF0' },
-    { label: 'Sci',  h: 88, color: '#0051D5' },
-    { label: 'Arts', h: 62, color: '#B8CBF5' },
-    { label: 'Hist', h: 72, color: '#9EB8F0' },
-    { label: 'Tech', h: 50, color: '#D4E1FA' },
-  ];
+  { label: 'Eng',  h: 124.8,  color: '#C7D7F8' },
+  { label: 'Math', h: 153.59, color: '#A8BEF0' },
+  { label: 'Sci',  h: 180.47, color: '#316BF3' },
+  { label: 'Arts', h: 138.23, color: '#B8CBF5' },
+  { label: 'Hist', h: 168.95, color: '#9EB8F0' },
+  { label: 'Tech', h: 105.59, color: '#D4E1FA' },
+];
 
   const notifIcon = (type: string) => {
     switch (type) {
@@ -264,8 +265,8 @@ export default function Dashboard() {
 
       <style>{`
         .nav-item { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; }
-        .nav-item:hover { background: rgba(255,255,255,0.15) !important; }
-        .nav-item-active { background: rgba(255,255,255,0.2) !important; }
+        .nav-item:hover { background: rgba(49,107,243,0.08) !important; }
+        .nav-item-active { background: #316BF3 !important; }
         .stat-card { transition: all 0.25s ease; cursor: pointer; }
         .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,81,213,0.15) !important; border-color: #0051D5 !important; }
         .action-row { transition: all 0.2s ease; cursor: pointer; border-radius: 8px; }
@@ -278,8 +279,8 @@ export default function Dashboard() {
         .approve-btn:hover { background: #0051D5 !important; color: #fff !important; }
         .review-btn { transition: all 0.2s ease; }
         .review-btn:hover { background: rgba(255,255,255,0.25) !important; }
-        .sidebar-bottom { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.7); font-size: 14px; }
-        .sidebar-bottom:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .sidebar-bottom { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 10px; color: #45464D; font-size: 14px; }
+        .sidebar-bottom:hover { background: rgba(49,107,243,0.08); color: #316BF3; }
         .logout-btn:hover { background: rgba(255,80,80,0.2) !important; color: #fff !important; }
         .perf-bar { transition: opacity 0.2s ease; cursor: pointer; }
         .perf-bar:hover { opacity: 0.75; }
@@ -295,17 +296,17 @@ export default function Dashboard() {
       `}</style>
 
       {/* ── SIDEBAR ─────────────────────────────────── */}
-      <aside style={{ width: '240px', background: '#0051D5', display: 'flex', flexDirection: 'column', padding: '24px 16px', position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 40 }}>
+      <aside style={{ width: '240px', background: '#EFF4FF', display: 'flex', flexDirection: 'column', padding: '24px 16px', position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 40 }}>
 
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', padding: '0 8px', cursor: 'pointer' }}
           onClick={() => navigate('/dashboard')}>
-          <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '8px', padding: '6px', display: 'flex' }}>
+          <div style={{ background: '#316BF3', borderRadius: '8px', padding: '6px', display: 'flex' }}>
             <GraduationCap size={20} color="#fff" />
           </div>
           <div>
-            <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '14px', color: '#fff', margin: 0 }}>EduStruc SMS</p>
-            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.65)', margin: 0, letterSpacing: '0.06em' }}>ADMIN PORTAL</p>
+            <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '14px', color: '#0B1C30', margin: 0 }}>EduStruc SMS</p>
+            <p style={{ fontSize: '10px', color: '#76777D', margin: 0, letterSpacing: '0.06em' }}>ADMIN PORTAL</p>
           </div>
         </div>
 
@@ -315,7 +316,7 @@ export default function Dashboard() {
             <div key={i}
               className={`nav-item ${activeNav === item.label ? 'nav-item-active' : ''}`}
               onClick={() => handleNavClick(item.label, item.path)}
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', color: activeNav === item.label ? '#fff' : 'rgba(255,255,255,0.75)', fontSize: '14px', fontWeight: activeNav === item.label ? 600 : 400 }}>
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', color: activeNav === item.label ? '#fff' : '#45464D', fontSize: '14px', fontWeight: activeNav === item.label ? 600 : 400 }}>
               {item.icon} {item.label}
             </div>
           ))}
@@ -329,7 +330,7 @@ export default function Dashboard() {
         </nav>
 
         {/* Bottom items */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <div style={{ borderTop: '1px solid #C6C6CD', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <div className="sidebar-bottom" onClick={() => navigate('/support')}>
   <HelpCircle size={15} /> Support
 </div>
@@ -343,7 +344,7 @@ export default function Dashboard() {
       <div style={{ marginLeft: '240px', flex: 1, display: 'flex', flexDirection: 'column' }}>
 
         {/* Top Nav */}
-        <header style={{ background: '#fff', borderBottom: '1px solid #C6C6CD', height: '64px', padding: '0 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
+        <header style={{ background: '#F8F9FF', borderBottom: '1px solid #E5E7EB', height: 'auto', minHeight: '80px', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
           <div>
             <h1 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '20px', color: '#0B1C30', margin: 0 }}>Dashboard Overview</h1>
             <p style={{ fontSize: '13px', color: '#76777D', margin: 0 }}>
@@ -569,21 +570,21 @@ export default function Dashboard() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '16px', color: '#0B1C30', margin: 0 }}>Institutional Performance</h3>
               <div onClick={() => navigate('/reports')}
-                style={{ border: '1px solid #C6C6CD', borderRadius: '6px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#45464D', transition: 'all 0.2s ease' }}
+  style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '6px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#45464D', transition: 'all 0.2s ease' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#0051D5'; (e.currentTarget as HTMLDivElement).style.color = '#0051D5'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#C6C6CD'; (e.currentTarget as HTMLDivElement).style.color = '#45464D'; }}>
                 This Quarter <ChevronRight size={12} style={{ transform: 'rotate(90deg)' }} />
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', height: '120px', paddingBottom: '8px' }}>
-              {perfData.map((bar, i) => (
-                <div key={i} className="perf-bar"
-                  style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', height: '100%', justifyContent: 'flex-end' }}>
-                  <div style={{ width: '100%', height: `${bar.h}%`, background: bar.color, borderRadius: '4px 4px 0 0', transition: 'opacity 0.2s ease' }}></div>
-                  <span style={{ fontSize: '12px', color: '#76777D' }}>{bar.label}</span>
-                </div>
-              ))}
-            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', height: '181px', paddingBottom: '8px' }}>
+  {perfData.map((bar, i) => (
+    <div key={i} className="perf-bar"
+      style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', height: '100%', justifyContent: 'flex-end' }}>
+      <div style={{ width: '100%', height: `${bar.h}px`, background: bar.color, borderRadius: '4px 4px 0 0', transition: 'height 0.4s ease' }}></div>
+      <span style={{ fontSize: '12px', color: '#76777D' }}>{bar.label}</span>
+    </div>
+  ))}
+</div>
           </div>
         </main>
 

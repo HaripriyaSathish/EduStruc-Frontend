@@ -19,6 +19,8 @@ import Schedules             from './pages/Schedules';
 import CreateSchedule        from './pages/CreateSchedule';
 import SystemSettings        from './pages/SystemSettings';
 import HelpSupport           from './pages/HelpSupport';
+import Teachers               from './pages/Teachers';
+import ViewTeacher            from './pages/ViewTeacher';
 import TeacherLogin          from './pages/teacher/TeacherLogin';
 import TeacherForgotPassword from './pages/teacher/TeacherForgotPassword';
 import TeacherResetPassword  from './pages/teacher/TeacherResetPassword';
@@ -70,6 +72,8 @@ function App() {
         <Route path="/settings"          element={<ProtectedRoute allowedRoles={['admin']}><SystemSettings /></ProtectedRoute>} />
         <Route path="/support"           element={<ProtectedRoute allowedRoles={['admin']}><HelpSupport /></ProtectedRoute>} />
         <Route path="/reports"           element={<ProtectedRoute allowedRoles={['admin']}><Reports /></ProtectedRoute>} />
+        <Route path="/teachers"          element={<ProtectedRoute allowedRoles={['admin']}><Teachers /></ProtectedRoute>} />
+        <Route path="/teachers/:id"      element={<ProtectedRoute allowedRoles={['admin']}><ViewTeacher /></ProtectedRoute>} />
         <Route path="/teacher/login"             element={<TeacherLogin />} />
         <Route path="/teacher/forgot-password"            element={<TeacherForgotPassword />} />
         <Route path="/teacher/reset-password/:uid/:token" element={<TeacherResetPassword />} />

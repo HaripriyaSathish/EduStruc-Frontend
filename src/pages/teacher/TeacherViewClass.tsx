@@ -185,10 +185,10 @@ export default function TeacherViewClass() {
 
       <style>{`
         .nav-item { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; }
-        .nav-item:hover { background: rgba(255,255,255,0.15) !important; }
-        .nav-item-active { background: rgba(255,255,255,0.2) !important; }
-        .sidebar-bottom { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.7); font-size: 14px; }
-        .sidebar-bottom:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .nav-item:hover { background: rgba(49,107,243,0.08) !important; }
+        .nav-item-active { background: #316BF3 !important; }
+        .sidebar-bottom { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 10px; color: #45464D; font-size: 14px; }
+        .sidebar-bottom:hover { background: rgba(49,107,243,0.08); color: #316BF3; }
         .tab-btn { transition: all 0.2s ease; cursor: pointer; padding: 10px 20px; border: none; background: none; font-size: 14px; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -1px; color: #76777D; }
         .tab-btn:hover { color: #0051D5; }
         .tab-active { color: #0051D5 !important; border-bottom-color: #0051D5 !important; font-weight: 600 !important; }
@@ -204,16 +204,16 @@ export default function TeacherViewClass() {
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
 
-      <aside style={{ width: '240px', background: '#0051D5', display: 'flex', flexDirection: 'column', padding: '24px 16px', position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 40 }}>
+      <aside style={{ width: '240px', background: '#EFF4FF', display: 'flex', flexDirection: 'column', padding: '24px 16px', position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 40 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', cursor: 'pointer' }} onClick={() => navigate('/teacher/dashboard')}>
-          <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '8px', padding: '6px', display: 'flex' }}><GraduationCap size={20} color="#fff" /></div>
+          <div style={{ background: '#316BF3', borderRadius: '8px', padding: '6px', display: 'flex' }}><GraduationCap size={20} color="#fff" /></div>
           <div><p style={{ fontWeight: 700, fontSize: '14px', color: '#fff', margin: 0 }}>EduStruc SMS</p><p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.65)', margin: 0 }}>ADMIN PORTAL</p></div>
         </div>
         <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {navItems.map((item, i) => {
             const active = item.path === '/teacher/classes';
             return <div key={i} className={`nav-item ${active ? 'nav-item-active' : ''}`} onClick={() => navigate(item.path)}
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', color: active ? '#fff' : 'rgba(255,255,255,0.75)', fontSize: '14px', fontWeight: active ? 600 : 400 }}>
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', color: active ? '#fff' : '#45464D', fontSize: '14px', fontWeight: active ? 600 : 400 }}>
               {item.icon} {item.label}
             </div>;
           })}
@@ -222,14 +222,14 @@ export default function TeacherViewClass() {
             <Plus size={15} /> Add New Student
           </button>
         </nav>
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '16px' }}>
+        <div style={{ borderTop: '1px solid #C6C6CD', paddingTop: '16px' }}>
           <div className="sidebar-bottom" onClick={() => navigate('/teacher/support')}><HelpCircle size={15} /> Support</div>
           <div className="sidebar-bottom" onClick={() => { logoutUser(); navigate('/teacher/logged-out'); }}><LogOut size={15} /> Logout</div>
         </div>
       </aside>
 
       <div style={{ marginLeft: '240px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <header style={{ background: '#fff', borderBottom: '1px solid #C6C6CD', height: '64px', padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
+        <header style={{ background: '#F8F9FF', borderBottom: '1px solid #E5E7EB', height: 'auto', minHeight: '80px', padding: '16px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <span style={{ fontSize: '13px', color: '#76777D', cursor: 'pointer' }} onClick={() => navigate('/teacher/classes')}>Classes</span>
             <span style={{ color: '#C6C6CD' }}>/</span>

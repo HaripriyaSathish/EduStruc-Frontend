@@ -1,5 +1,5 @@
 // src/pages/AdminBulkAttendance.tsx
-// Admin bulk attendance — mark all students across all classes in one page
+// Admin bulk attendance — mark all students across all grades in one page
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -26,13 +26,17 @@ interface StudentRow {
   attendance_id: number | null;
 }
 
-interface Course { id: number; course_name: string; }
+const GRADES = [
+  'Kindergarten 1', 'Kindergarten 2',
+  '1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade',
+  '6th Grade', '7th Grade', '8th Grade',
+  '9th Grade', '10th Grade', '11th Grade', '12th Grade',
+];
 
 export default function AdminBulkAttendance() {
   const navigate = useNavigate();
   const user     = getSession();
 
-  const [courses,   setCourses]   = useState<Course[]>([]);
   const [className, setClassName] = useState('');
   const [date,      setDate]      = useState(new Date().toISOString().slice(0, 10));
   const [eventName, setEventName] = useState('Regular School Day');
@@ -45,14 +49,8 @@ export default function AdminBulkAttendance() {
   const [error,     setError]     = useState('');
   const [fetched,   setFetched]   = useState(false);
 
-  useEffect(() => {
-    apiFetch(`${API_BASE}/api/courses/`)
-      .then(r => r.ok ? r.json() : [])
-      .then(setCourses);
-  }, []);
-
   const loadStudents = async () => {
-    if (!className) { setError('Please select a class first.'); return; }
+    if (!className) { setError('Please select a grade first.'); return; }
     setLoading(true); setError(''); setFetched(false);
     try {
       const res = await apiFetch(
@@ -116,6 +114,7 @@ export default function AdminBulkAttendance() {
   const navItems = [
     { icon: <LayoutDashboard size={16} />, label: 'Dashboard',  path: '/dashboard' },
     { icon: <Users size={16} />,           label: 'Students',   path: '/students' },
+    { icon: <GraduationCap size={16} />,   label: 'Teachers',   path: '/teachers' },
     { icon: <BookOpen size={16} />,        label: 'Courses',    path: '/courses' },
     { icon: <Calendar size={16} />,        label: 'Schedules',  path: '/schedules' },
     { icon: <ClipboardList size={16} />,   label: 'Attendance', path: '/attendance/bulk' },
@@ -126,11 +125,11 @@ export default function AdminBulkAttendance() {
     <div style={{ display: 'flex', minHeight: '100vh', background: '#F0F4FF', fontFamily: 'Inter, sans-serif' }}>
 
       <style>{`
-        .nav-item { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: rgba(255,255,255,0.75); font-size: 14px; }
-        .nav-item:hover { background: rgba(255,255,255,0.15) !important; color: #fff; }
-        .nav-item-active { background: rgba(255,255,255,0.2) !important; color: #fff !important; font-weight: 600 !important; }
-        .sidebar-bottom { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.7); font-size: 14px; }
-        .sidebar-bottom:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .nav-item { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: #45464D; font-size: 14px; }
+        .nav-item:hover { background: rgba(49,107,243,0.08) !important; color: #316BF3; }
+        .nav-item-active { background: #316BF3 !important; color: #fff !important; font-weight: 600 !important; }
+        .sidebar-bottom { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 10px; color: #45464D; font-size: 14px; }
+        .sidebar-bottom:hover { background: rgba(49,107,243,0.08); color: #316BF3; }
         .logout-btn:hover { background: rgba(255,80,80,0.2) !important; }
         .att-btn { border: none; border-radius: 6px; padding: 5px 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
         .att-btn:hover { opacity: 0.85; transform: scale(1.03); }
@@ -147,15 +146,15 @@ export default function AdminBulkAttendance() {
       `}</style>
 
       {/* SIDEBAR */}
-      <aside style={{ width: '240px', background: '#0051D5', display: 'flex', flexDirection: 'column', padding: '24px 16px', position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 40 }}>
+      <aside style={{ width: '240px', background: '#EFF4FF', display: 'flex', flexDirection: 'column', padding: '24px 16px', position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 40 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', cursor: 'pointer' }}
           onClick={() => navigate('/dashboard')}>
-          <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '8px', padding: '6px', display: 'flex' }}>
+          <div style={{ background: '#316BF3', borderRadius: '8px', padding: '6px', display: 'flex' }}>
             <GraduationCap size={20} color="#fff" />
           </div>
           <div>
-            <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '14px', color: '#fff', margin: 0 }}>EduStruc SMS</p>
-            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.65)', margin: 0 }}>ADMIN PORTAL</p>
+            <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '14px', color: '#0B1C30', margin: 0 }}>EduStruc SMS</p>
+            <p style={{ fontSize: '10px', color: '#76777D', margin: 0 }}>ADMIN PORTAL</p>
           </div>
         </div>
 
@@ -175,7 +174,7 @@ export default function AdminBulkAttendance() {
           </button>
         </nav>
 
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <div style={{ borderTop: '1px solid #C6C6CD', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <div className="sidebar-bottom" onClick={() => navigate('/support')}><HelpCircle size={15} /> Support</div>
           <div className="sidebar-bottom logout-btn" onClick={() => { logoutUser(); navigate('/logged-out'); }}><LogOut size={15} /> Logout</div>
         </div>
@@ -184,10 +183,10 @@ export default function AdminBulkAttendance() {
       {/* MAIN */}
       <div style={{ marginLeft: '240px', flex: 1, display: 'flex', flexDirection: 'column' }}>
 
-        <header style={{ background: '#fff', borderBottom: '1px solid #C6C6CD', height: '64px', padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
+        <header style={{ background: '#F8F9FF', borderBottom: '1px solid #E5E7EB', height: 'auto', minHeight: '80px', padding: '16px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
           <div>
             <h1 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '20px', color: '#0B1C30', margin: 0 }}>Bulk Attendance</h1>
-            <p style={{ fontSize: '13px', color: '#76777D', margin: 0 }}>Mark attendance for an entire class in one go — saves to MySQL instantly.</p>
+            <p style={{ fontSize: '13px', color: '#76777D', margin: 0 }}>Mark attendance for an entire grade in one go — saves to MySQL instantly.</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => navigate('/settings')}>
             <div style={{ textAlign: 'right' }}>
@@ -203,15 +202,15 @@ export default function AdminBulkAttendance() {
           {/* Config card */}
           <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '20px', marginBottom: '16px' }}>
             <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '15px', color: '#0B1C30', margin: '0 0 16px' }}>
-              Select Class & Date
+              Select Grade & Date
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '14px', alignItems: 'flex-end' }}>
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 600, color: '#45464D', letterSpacing: '0.05em', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Class / Course</label>
+                <label style={{ fontSize: '11px', fontWeight: 600, color: '#45464D', letterSpacing: '0.05em', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Grade</label>
                 <select value={className} onChange={e => { setClassName(e.target.value); setFetched(false); }}
                   style={{ width: '100%', padding: '9px 12px', border: '1px solid #C6C6CD', borderRadius: '8px', fontSize: '13px', color: '#45464D', background: '#fff', outline: 'none', boxSizing: 'border-box' }}>
-                  <option value="">Select a class...</option>
-                  {courses.map(c => <option key={c.id} value={c.course_name}>{c.course_name}</option>)}
+                  <option value="">Select a grade...</option>
+                  {GRADES.map(g => <option key={g} value={g}>{g}</option>)}
                 </select>
               </div>
               <div>
@@ -292,7 +291,7 @@ export default function AdminBulkAttendance() {
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: '#F8F9FF', borderBottom: '1px solid #E5E7EB' }}>
-                      {['#', 'STUDENT NAME', 'ROLL NO', 'CLASS', 'ATTENDANCE'].map((col, i) => (
+                      {['#', 'STUDENT NAME', 'ROLL NO', 'GRADE', 'ATTENDANCE'].map((col, i) => (
                         <th key={i} style={{ padding: '10px 20px', textAlign: 'left', fontSize: '11px', fontWeight: 600, color: '#76777D', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{col}</th>
                       ))}
                     </tr>
@@ -341,13 +340,13 @@ export default function AdminBulkAttendance() {
           {fetched && students.length === 0 && (
             <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '48px', textAlign: 'center' }}>
               <Users size={36} color="#C6C6CD" style={{ display: 'block', margin: '0 auto 12px' }} />
-              <p style={{ fontWeight: 600, color: '#45464D', margin: '0 0 6px' }}>No students found for this class</p>
-              <p style={{ fontSize: '13px', color: '#76777D', margin: 0 }}>Make sure the class name matches what students are enrolled in.</p>
+              <p style={{ fontWeight: 600, color: '#45464D', margin: '0 0 6px' }}>No students found for this grade</p>
+              <p style={{ fontSize: '13px', color: '#76777D', margin: 0 }}>Make sure students are enrolled with this exact grade level.</p>
             </div>
           )}
         </main>
 
-        <footer style={{ background: '#D3E4FE', borderTop: '1px solid #C6C6CD', padding: '14px 48px', textAlign: 'center' }}>
+        <footer style={{ background: '#D3E4FE', borderTop: '1px solid #C6C6CD', padding: '20px 48px', textAlign: 'center' }}>
           <p style={{ fontSize: '13px', color: '#45464D', margin: 0 }}>© 2024 EduStruc Academic Systems. All rights reserved.</p>
         </footer>
       </div>

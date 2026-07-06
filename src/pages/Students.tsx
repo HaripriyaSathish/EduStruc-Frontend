@@ -98,9 +98,10 @@ export default function Students() {
     setCurrentPage(1);
   };
 
-  const navItems = [
+ const navItems = [
   { icon: <LayoutDashboard size={16} />, label: 'Dashboard',  path: '/dashboard' },
   { icon: <Users size={16} />,           label: 'Students',   path: '/students' },
+  { icon: <GraduationCap size={16} />,   label: 'Teachers',   path: '/teachers' },
   { icon: <BookOpen size={16} />,        label: 'Courses',    path: '/courses' },
   { icon: <Calendar size={16} />,        label: 'Schedules',  path: '/schedules' },
   { icon: <ClipboardList size={16} />,   label: 'Attendance', path: '/attendance/bulk' },
@@ -127,11 +128,11 @@ export default function Students() {
 
       <style>{`
         .nav-item { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; }
-        .nav-item:hover { background: rgba(255,255,255,0.15) !important; }
-        .nav-item-active { background: rgba(255,255,255,0.2) !important; }
+        .nav-item:hover { background: rgba(49,107,243,0.08) !important; }
+        .nav-item-active { background: #316BF3 !important; }
         .add-btn:hover { background: #003DAA !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,81,213,0.3); }
-        .sidebar-bottom { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.7); font-size: 14px; }
-        .sidebar-bottom:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .sidebar-bottom { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 10px; color: #45464D; font-size: 14px; }
+        .sidebar-bottom:hover { background: rgba(49,107,243,0.08); color: #316BF3; }
         .logout-btn:hover { background: rgba(255,80,80,0.2) !important; color: #fff !important; }
         .table-row { transition: background 0.15s ease; }
         .table-row:hover { background: #F0F7FF !important; }
@@ -147,14 +148,14 @@ export default function Students() {
       `}</style>
 
       {/* ── SIDEBAR ─────────────────────────────────── */}
-      <aside style={{ width: '240px', background: '#0051D5', display: 'flex', flexDirection: 'column', padding: '24px 16px', position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 40 }}>
+      <aside style={{ width: '240px', background: '#EFF4FF', display: 'flex', flexDirection: 'column', padding: '24px 16px', position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 40 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', padding: '0 8px', cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
-          <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '8px', padding: '6px', display: 'flex' }}>
+          <div style={{ background: '#316BF3', borderRadius: '8px', padding: '6px', display: 'flex' }}>
             <GraduationCap size={20} color="#fff" />
           </div>
           <div>
-            <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '14px', color: '#fff', margin: 0 }}>EduStruc SMS</p>
-            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.65)', margin: 0, letterSpacing: '0.06em' }}>ADMIN PORTAL</p>
+            <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '14px', color: '#0B1C30', margin: 0 }}>EduStruc SMS</p>
+            <p style={{ fontSize: '10px', color: '#76777D', margin: 0, letterSpacing: '0.06em' }}>ADMIN PORTAL</p>
           </div>
         </div>
 
@@ -162,7 +163,7 @@ export default function Students() {
           {navItems.map((item, i) => (
             <div key={i} className={`nav-item ${activeNav === item.label ? 'nav-item-active' : ''}`}
               onClick={() => { setActiveNav(item.label); navigate(item.path); }}
-              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', color: activeNav === item.label ? '#fff' : 'rgba(255,255,255,0.75)', fontSize: '14px', fontWeight: activeNav === item.label ? 600 : 400 }}>
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', color: activeNav === item.label ? '#fff' : '#45464D', fontSize: '14px', fontWeight: activeNav === item.label ? 600 : 400 }}>
               {item.icon} {item.label}
             </div>
           ))}
@@ -172,7 +173,7 @@ export default function Students() {
           </button>
         </nav>
 
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <div style={{ borderTop: '1px solid #C6C6CD', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <div className="sidebar-bottom" onClick={() => navigate('/support')}>
   <HelpCircle size={15} /> Support
 </div>
@@ -184,7 +185,7 @@ export default function Students() {
       <div style={{ marginLeft: '240px', flex: 1, display: 'flex', flexDirection: 'column' }}>
 
         {/* Top Bar */}
-        <header style={{ background: '#fff', borderBottom: '1px solid #C6C6CD', height: '64px', padding: '0 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
+        <header style={{ background: '#F8F9FF', borderBottom: '1px solid #E5E7EB', height: 'auto', minHeight: '80px', padding: '16px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
           <div>
             <h1 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '20px', color: '#0B1C30', margin: 0 }}>Student Directory</h1>
             <p style={{ fontSize: '13px', color: '#76777D', margin: 0 }}>Manage and track student enrollment and academic records.</p>
@@ -222,11 +223,21 @@ export default function Students() {
               {/* Grade filter */}
               <select value={gradeFilter} onChange={e => setGradeFilter(e.target.value)}
                 style={{ padding: '4px 10px', border: '1px solid #C6C6CD', borderRadius: '999px', fontSize: '12px', fontWeight: 500, color: gradeFilter ? '#0051D5' : '#45464D', background: gradeFilter ? '#DCE9FF' : '#fff', cursor: 'pointer', outline: 'none' }}>
-                <option value="">All Grades</option>
-                <option value="10th">Grade: 10th</option>
-                <option value="11th">Grade: 11th</option>
-                <option value="12th">Grade: 12th</option>
-                <option value="9th">Grade: 9th</option>
+               <option value="">All Grades</option>
+  <option value="Kindergarten 1">Kindergarten 1</option>
+  <option value="Kindergarten 2">Kindergarten 2</option>
+  <option value="1st Grade">1st Grade</option>
+  <option value="2nd Grade">2nd Grade</option>
+  <option value="3rd Grade">3rd Grade</option>
+  <option value="4th Grade">4th Grade</option>
+  <option value="5th Grade">5th Grade</option>
+  <option value="6th Grade">6th Grade</option>
+  <option value="7th Grade">7th Grade</option>
+  <option value="8th Grade">8th Grade</option>
+  <option value="9th Grade">9th Grade</option>
+  <option value="10th Grade">10th Grade</option>
+  <option value="11th Grade">11th Grade</option>
+  <option value="12th Grade">12th Grade</option>
               </select>
 
               {/* Status filter */}

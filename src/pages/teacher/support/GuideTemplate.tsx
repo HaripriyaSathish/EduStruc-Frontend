@@ -17,7 +17,7 @@ function GuidePage({ title, category, readTime, sections }: Props) {
   const user     = getSession();
   return (
     <div style={{ minHeight: '100vh', background: '#F8F9FF', fontFamily: 'Inter, sans-serif' }}>
-      <header style={{ background: '#fff', borderBottom: '1px solid #C6C6CD', height: '64px', padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
+      <header style={{ background: '#F8F9FF', borderBottom: '1px solid #E5E7EB', height: 'auto', minHeight: '80px', padding: '16px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '13px', color: '#76777D', cursor: 'pointer' }} onClick={() => navigate('/teacher/support')}>Support</span>
           <span style={{ color: '#C6C6CD' }}>/</span>

@@ -262,10 +262,10 @@ export default function TeacherStudents() {
 
       <style>{`
         .nav-item { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; }
-        .nav-item:hover { background: rgba(255,255,255,0.15) !important; }
-        .nav-item-active { background: rgba(255,255,255,0.2) !important; }
-        .sidebar-bottom { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.7); font-size: 14px; }
-        .sidebar-bottom:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .nav-item:hover { background: rgba(49,107,243,0.08) !important; }
+        .nav-item-active { background: #316BF3 !important; }
+        .sidebar-bottom { transition: all 0.2s ease; border-radius: 8px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 10px; color: #45464D; font-size: 14px; }
+        .sidebar-bottom:hover { background: rgba(49,107,243,0.08); color: #316BF3; }
         .logout-btn:hover { background: rgba(255,80,80,0.2) !important; }
         .add-btn-side:hover { background: #003DAA !important; }
         .table-row { transition: background 0.15s ease; }
@@ -288,14 +288,14 @@ export default function TeacherStudents() {
       `}</style>
 
       {/* SIDEBAR */}
-      <aside style={{ width: '240px', background: '#0051D5', display: 'flex', flexDirection: 'column', padding: '24px 16px', position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 40 }}>
+      <aside style={{ width: '240px', background: '#EFF4FF', display: 'flex', flexDirection: 'column', padding: '24px 16px', position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 40 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', padding: '0 8px', cursor: 'pointer' }} onClick={() => navigate('/teacher/dashboard')}>
-          <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '8px', padding: '6px', display: 'flex' }}>
+          <div style={{ background: '#316BF3', borderRadius: '8px', padding: '6px', display: 'flex' }}>
             <GraduationCap size={20} color="#fff" />
           </div>
           <div>
-            <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '14px', color: '#fff', margin: 0 }}>EduStruc SMS</p>
-            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.65)', margin: 0 }}>ADMIN PORTAL</p>
+            <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '14px', color: '#0B1C30', margin: 0 }}>EduStruc SMS</p>
+            <p style={{ fontSize: '10px', color: '#76777D', margin: 0 }}>ADMIN PORTAL</p>
           </div>
         </div>
         <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -304,7 +304,7 @@ export default function TeacherStudents() {
             return (
               <div key={i} className={`nav-item ${active ? 'nav-item-active' : ''}`}
                 onClick={() => navigate(item.path)}
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', color: active ? '#fff' : 'rgba(255,255,255,0.75)', fontSize: '14px', fontWeight: active ? 600 : 400 }}>
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', color: active ? '#fff' : '#45464D', fontSize: '14px', fontWeight: active ? 600 : 400 }}>
                 {item.icon} {item.label}
               </div>
             );
@@ -314,7 +314,7 @@ export default function TeacherStudents() {
             <Plus size={15} /> Add New Student
           </button>
         </nav>
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <div style={{ borderTop: '1px solid #C6C6CD', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <div className="sidebar-bottom" onClick={() => navigate('/teacher/support')}><HelpCircle size={15} /> Support</div>
           <div className="sidebar-bottom logout-btn" onClick={() => { logoutUser(); navigate('/teacher/logged-out'); }}><LogOut size={15} /> Logout</div>
         </div>
@@ -324,7 +324,7 @@ export default function TeacherStudents() {
       <div style={{ marginLeft: '240px', flex: 1, display: 'flex', flexDirection: 'column' }}>
 
         {/* Header */}
-        <header style={{ background: '#fff', borderBottom: '1px solid #C6C6CD', height: '64px', padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
+        <header style={{ background: '#F8F9FF', borderBottom: '1px solid #E5E7EB', height: 'auto', minHeight: '80px', padding: '16px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 30 }}>
           <div>
             <h1 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '20px', color: '#0B1C30', margin: 0 }}>Student Directory</h1>
             <p style={{ fontSize: '13px', color: '#76777D', margin: 0 }}>Manage and track student enrollment and academic records.</p>
@@ -611,7 +611,7 @@ export default function TeacherStudents() {
           </div>
         </main>
 
-        <footer style={{ background: '#D3E4FE', borderTop: '1px solid #C6C6CD', padding: '14px 48px', textAlign: 'center' }}>
+        <footer style={{ background: '#D3E4FE', borderTop: '1px solid #C6C6CD', padding: '20px 48px', textAlign: 'center' }}>
           <p style={{ fontSize: '13px', color: '#45464D', margin: '0 0 2px' }}>© 2024 EduStruc Academic Systems. All rights reserved.</p>
         </footer>
       </div>

@@ -165,7 +165,7 @@ export default function TeacherLogin() {
       </div>
 
       {/* Footer */}
-      <footer style={{ padding: '16px 48px', textAlign: 'center', borderTop: '1px solid #E5E7EB' }}>
+      <footer style={{ padding: '20px 48px', textAlign: 'center', borderTop: '1px solid #E5E7EB' }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '6px' }}>
           {['Help Center', 'Privacy Policy', 'Accessibility'].map((l, i) => (
             <a key={i} href="#" className="footer-link"
