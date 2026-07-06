@@ -19,8 +19,19 @@ interface Course {
 }
 
 const DAYS = ['MON','TUE','WED','THU','FRI'];
-const DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
 const HOURS = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+
+function getWeekDates(offset: number) {
+  const now = new Date();
+  const day = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1) + offset * 7);
+  return Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+}
 
 // Map day name to column index
 const dayToIndex = (day: string): number => {
@@ -48,8 +59,6 @@ const BLOCK_COLORS = [
   { bg: '#CCFBF1', border: '#14B8A6', text: '#0F766E', label: 'Research Time' },
 ];
 
-const WEEK_DATES = [11, 12, 13, 14, 15]; // March 11-15
-
 export default function TeacherSchedules() {
   const navigate = useNavigate();
   const user     = getSession();
@@ -60,6 +69,8 @@ export default function TeacherSchedules() {
   const [viewMode,  setViewMode]  = useState<'week'|'day'>('week');
   const [weekOffset, setWeekOffset] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const weekDates = getWeekDates(weekOffset);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -153,7 +164,7 @@ export default function TeacherSchedules() {
             );
           })}
           <button className="add-btn-side" onClick={() => navigate('/teacher/students/new')}
-            style={{ background: '#003EA8', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', borderRadius: '8px', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 500, cursor: 'pointer', marginTop: '16px', width: '100%', transition: 'all 0.2s ease' }}>
+            style={{ background: '#316BF3', border: '1px solid #316BF3', color: '#fff', borderRadius: '8px', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 500, cursor: 'pointer', marginTop: '16px', width: '100%', transition: 'all 0.2s ease' }}>
             <Plus size={15} /> Add New Student
           </button>
         </nav>
@@ -190,7 +201,7 @@ export default function TeacherSchedules() {
             <div>
               <h1 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '22px', color: '#0B1C30', margin: '0 0 2px' }}>Weekly Schedule</h1>
               <p style={{ fontSize: '13px', color: '#76777D', margin: 0 }}>
-                Managing Semester 2: March {11 + weekOffset * 7} – {15 + weekOffset * 7}, 2024
+                Managing Semester 2: {weekDates[0].toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} – {weekDates[4].toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
               </p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -234,14 +245,18 @@ export default function TeacherSchedules() {
             {/* Day headers */}
             <div style={{ display: 'grid', gridTemplateColumns: '64px repeat(5, 1fr)', borderBottom: '1px solid #E5E7EB' }}>
               <div style={{ padding: '12px', borderRight: '1px solid #E5E7EB' }}></div>
-              {DAYS.map((day, i) => (
-                <div key={day} style={{ padding: '12px 8px', textAlign: 'center', borderRight: i < 4 ? '1px solid #E5E7EB' : 'none', background: i === 1 ? '#EFF4FF' : '#fff' }}>
-                  <p style={{ fontSize: '11px', fontWeight: 600, color: '#76777D', margin: '0 0 2px', letterSpacing: '0.06em' }}>{day}</p>
-                  <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '18px', color: i === 1 ? '#0051D5' : '#0B1C30', margin: 0 }}>
-                    {WEEK_DATES[i] + weekOffset * 7}
-                  </p>
-                </div>
-              ))}
+              {DAYS.map((day, i) => {
+                const today = new Date();
+                const isToday = weekDates[i].toDateString() === today.toDateString();
+                return (
+                  <div key={day} style={{ padding: '12px 8px', textAlign: 'center', borderRight: i < 4 ? '1px solid #E5E7EB' : 'none', background: isToday ? '#EFF4FF' : '#fff' }}>
+                    <p style={{ fontSize: '11px', fontWeight: 600, color: '#76777D', margin: '0 0 2px', letterSpacing: '0.06em' }}>{day}</p>
+                    <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '18px', color: isToday ? '#0051D5' : '#0B1C30', margin: 0 }}>
+                      {weekDates[i].getDate()}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Time grid */}
@@ -264,47 +279,57 @@ export default function TeacherSchedules() {
                   </div>
 
                   {/* Day columns */}
-                  {DAYS.map((day, colIdx) => (
-                    <div key={day} style={{ position: 'relative', borderLeft: '1px solid #E5E7EB', background: colIdx === 1 ? '#FAFCFF' : '#fff' }}>
-                      {/* Hour cells */}
-                      {HOURS.map(hr => (
-                        <div key={hr} style={{ height: `${CELL_HEIGHT}px`, borderBottom: '1px solid #F0F4FF' }}></div>
-                      ))}
+                  {DAYS.map((day, colIdx) => {
+                    const isToday = weekDates[colIdx].toDateString() === new Date().toDateString();
+                    return (
+                      <div key={day} style={{ position: 'relative', borderLeft: '1px solid #E5E7EB', background: isToday ? '#FAFCFF' : '#fff' }}>
+                        {/* Hour cells */}
+                        {HOURS.map(hr => (
+                          <div key={hr} style={{ height: `${CELL_HEIGHT}px`, borderBottom: '1px solid #F0F4FF' }}></div>
+                        ))}
 
-                      {/* Schedule blocks */}
-                      {filteredSchedules.map((s, idx) => {
-                        if (dayToIndex(s.day) !== colIdx) return null;
-                        const top    = toMinutes(s.start_time);
-                        const bottom = toMinutes(s.end_time);
-                        const height = Math.max(30, bottom - top);
-                        if (top < 0 || top >= TOTAL_HOURS * 60) return null;
-                        const color  = getBlockColor(idx);
-                        return (
-                          <div key={s.id} className="schedule-block"
-                            style={{ top: `${top}px`, height: `${height}px`, background: color.bg, borderLeft: `3px solid ${color.border}` }}>
-                            <p style={{ fontSize: '11px', fontWeight: 700, color: color.text, margin: '0 0 2px', lineHeight: 1.2 }}>
-                              {s.start_time} – {s.end_time}
-                            </p>
-                            <p style={{ fontSize: '12px', fontWeight: 600, color: '#0B1C30', margin: '0 0 2px', lineHeight: 1.3 }}>
-                              {s.course_name}
-                            </p>
-                            {height > 40 && s.room && (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                <MapPin size={9} color="#76777D" />
-                                <span style={{ fontSize: '10px', color: '#76777D' }}>{s.room}</span>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                        {/* Schedule blocks */}
+                        {filteredSchedules.map((s, idx) => {
+                          if (dayToIndex(s.day) !== colIdx) return null;
+                          const top    = toMinutes(s.start_time);
+                          const bottom = toMinutes(s.end_time);
+                          const height = Math.max(30, bottom - top);
+                          if (top < 0 || top >= TOTAL_HOURS * 60) return null;
+                          const color  = getBlockColor(idx);
+                          return (
+                            <div key={s.id} className="schedule-block"
+                              style={{ top: `${top}px`, height: `${height}px`, background: color.bg, borderLeft: `3px solid ${color.border}` }}>
+                              <p style={{ fontSize: '11px', fontWeight: 700, color: color.text, margin: '0 0 2px', lineHeight: 1.2 }}>
+                                {s.start_time} – {s.end_time}
+                              </p>
+                              <p style={{ fontSize: '12px', fontWeight: 600, color: '#0B1C30', margin: '0 0 2px', lineHeight: 1.3 }}>
+                                {s.course_name}
+                              </p>
+                              {height > 40 && s.room && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                  <MapPin size={9} color="#76777D" />
+                                  <span style={{ fontSize: '10px', color: '#76777D' }}>{s.room}</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Red "now" line — only shown on today's column if today falls in this week */}
+                {weekDates.some(d => d.toDateString() === new Date().toDateString()) && (() => {
+                  const now = new Date();
+                  const nowMinutes = (now.getHours() - 8) * 60 + now.getMinutes();
+                  if (nowMinutes < 0 || nowMinutes > TOTAL_HOURS * 60) return null;
+                  return (
+                    <div style={{ position: 'absolute', left: '64px', right: 0, top: `${nowMinutes}px`, height: '2px', background: '#EF4444', zIndex: 5, pointerEvents: 'none' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EF4444', marginTop: '-3px', marginLeft: '-4px' }}></div>
                     </div>
-                  ))}
-                </div>
-
-                {/* Red "now" line — on Tuesday column for demo */}
-                <div style={{ position: 'absolute', left: '64px', right: 0, top: `${CELL_HEIGHT * 4 + 20}px`, height: '2px', background: '#EF4444', zIndex: 5, pointerEvents: 'none' }}>
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EF4444', marginTop: '-3px', marginLeft: '-4px' }}></div>
-                </div>
+                  );
+                })()}
               </div>
             )}
           </div>
@@ -361,7 +386,7 @@ export default function TeacherSchedules() {
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
                     <MapPin size={11} color="rgba(255,255,255,0.6)" />
-                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>{nextClass.room} • Starts in 12m</span>
+                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>{nextClass.room} • Starts soon</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '14px' }}>
                     <Clock size={11} color="rgba(255,255,255,0.6)" />
