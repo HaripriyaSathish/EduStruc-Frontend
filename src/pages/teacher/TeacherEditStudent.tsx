@@ -322,7 +322,7 @@ export default function TeacherEditStudent() {
                       <select className="form-input" style={inputStyle}
                         value={form.class_name} onChange={e => set('class_name', e.target.value)}>
                         <option value="">Select Grade</option>
-                        {['9th Grade','10th Grade','11th Grade','12th Grade'].map(g => (
+                        {['Kindergarden 1','Kindergarden 2','1st Grade','2nd Grade','3rd Grade','4th Grade','5th Grade','6th Grade','7th Grade','8th Grade','9th Grade','10th Grade','11th Grade','12th Grade'].map(g => (
                           <option key={g} value={g}>{g}</option>
                         ))}
                       </select>

@@ -63,7 +63,7 @@ export default function TeacherStudents() {
   const [courses,        setCourses]        = useState<Course[]>([]);
   const [loading,        setLoading]        = useState(true);
   const [searchQuery,    setSearchQuery]    = useState('');
-  const [selectedCourse, setSelectedCourse] = useState('all');
+  const [selectedGrade,  setSelectedGrade]  = useState('all');
   const [statusFilter,   setStatusFilter]   = useState('All Students');
   const [currentPage,    setCurrentPage]    = useState(1);
   const [openMenu,       setOpenMenu]       = useState<number | null>(null);
@@ -199,6 +199,11 @@ export default function TeacherStudents() {
     }
   };
 
+  // Distinct grades/classes derived from the real student list (e.g. "10th Grade")
+  const availableGrades = Array.from(
+    new Set(students.map(s => s.class_name).filter(Boolean))
+  ).sort();
+
   const filtered = students.filter(s => {
     const matchSearch = !searchQuery ||
       s.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -206,19 +211,26 @@ export default function TeacherStudents() {
       s.roll_number.toLowerCase().includes(searchQuery.toLowerCase());
     const matchStatus = statusFilter === 'All Students' ||
       s.status.toLowerCase() === statusFilter.toLowerCase();
-    return matchSearch && matchStatus;
+    const matchGrade = selectedGrade === 'all' || s.class_name === selectedGrade;
+    return matchSearch && matchStatus && matchGrade;
   });
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated  = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  // Real aggregate stats from real data
-  const recordedAttendances = Object.values(attendanceScores);
+  // Real aggregate stats — computed from the FILTERED (currently selected grade) students only,
+  // so switching the grade filter updates Avg Attendance / Class Average accordingly.
+  const recordedAttendances = filtered
+    .map(s => attendanceScores[s.id])
+    .filter((v): v is number => v !== undefined);
   const avgAttendance = recordedAttendances.length > 0
     ? Math.round(recordedAttendances.reduce((a, v) => a + v, 0) / recordedAttendances.length)
     : null;
 
-  const recordedGrades = Object.values(latestGrades).map(g => g.percentage);
+  const recordedGrades = filtered
+    .map(s => latestGrades[s.id])
+    .filter((g): g is GradeRecord => g !== undefined)
+    .map(g => g.percentage);
   const classAvgScore = recordedGrades.length > 0
     ? Math.round(recordedGrades.reduce((a, v) => a + v, 0) / recordedGrades.length)
     : null;
@@ -232,12 +244,12 @@ export default function TeacherStudents() {
     return 'F';
   })();
 
-  const belowThreshold = students.filter(s => {
+  const belowThreshold = filtered.filter(s => {
     const att = attendanceScores[s.id];
     return att !== undefined && att < 70;
   });
-  const notActiveCount = students.filter(s => s.status !== 'active').length;
-  const ungradedCount  = students.filter(s => latestGrades[s.id] === undefined).length;
+  const notActiveCount = filtered.filter(s => s.status !== 'active').length;
+  const ungradedCount  = filtered.filter(s => latestGrades[s.id] === undefined).length;
 
   const navItems = [
     { icon: <LayoutDashboard size={16} />, label: 'Dashboard', path: '/teacher/dashboard' },
@@ -362,10 +374,10 @@ export default function TeacherStudents() {
                 <h2 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '18px', color: '#0B1C30', margin: 0 }}>Student Roster</h2>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <select value={selectedCourse} onChange={e => setSelectedCourse(e.target.value)}
+                <select value={selectedGrade} onChange={e => { setSelectedGrade(e.target.value); setCurrentPage(1); }}
                   style={{ padding: '7px 12px', border: '1px solid #C6C6CD', borderRadius: '8px', fontSize: '13px', color: '#45464D', background: '#fff', outline: 'none', cursor: 'pointer' }}>
                   <option value="all">All Courses</option>
-                  {courses.map(c => <option key={c.id} value={String(c.id)}>{c.course_name}</option>)}
+                  {availableGrades.map(g => <option key={g} value={g}>{g}</option>)}
                 </select>
                 <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }}
                   style={{ padding: '7px 12px', border: '1px solid #C6C6CD', borderRadius: '8px', fontSize: '13px', color: '#45464D', background: '#fff', outline: 'none', cursor: 'pointer' }}>
@@ -533,10 +545,10 @@ export default function TeacherStudents() {
             )}
           </div>
 
-          {/* Stats bottom row — Figma layout, real data */}
+          {/* Stats bottom row — Figma layout, real data, scoped to the selected grade filter */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px' }}>
 
-            {/* Avg Attendance — real, this month */}
+            {/* Avg Attendance — real, this month, for the currently filtered grade */}
             <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                 <p style={{ fontSize: '12px', fontWeight: 500, color: '#76777D', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>AVG. ATTENDANCE (THIS MONTH)</p>
@@ -551,11 +563,11 @@ export default function TeacherStudents() {
                 <div style={{ height: '6px', width: avgAttendance !== null ? `${avgAttendance}%` : '0%', background: (avgAttendance ?? 0) >= 80 ? '#009668' : '#DC2626', borderRadius: '999px', transition: 'width 0.6s ease' }}></div>
               </div>
               <p style={{ fontSize: '11px', color: '#76777D', margin: '8px 0 0' }}>
-                {recordedAttendances.length} of {students.length} students with records
+                {recordedAttendances.length} of {filtered.length} students with records
               </p>
             </div>
 
-            {/* Class Average — real, from most recent grade per student */}
+            {/* Class Average — real, from most recent grade per student, for the currently filtered grade */}
             <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                 <p style={{ fontSize: '12px', fontWeight: 500, color: '#76777D', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>CLASS AVERAGE</p>
@@ -569,7 +581,7 @@ export default function TeacherStudents() {
               </p>
             </div>
 
-            {/* Action Required */}
+            {/* Action Required — scoped to the currently filtered grade */}
             <div style={{ background: '#0B1C30', borderRadius: '12px', padding: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                 <AlertTriangle size={16} color="#FCD34D" />
