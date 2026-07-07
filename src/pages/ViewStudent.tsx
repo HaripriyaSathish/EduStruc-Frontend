@@ -29,8 +29,8 @@ interface Student {
   parent_name:   string;
   parent_phone:  string;
   created_at:    string;
+  avatar_url?:   string;
 }
-
 export default function ViewStudent() {
   const navigate    = useNavigate();
   const { id }      = useParams();
@@ -200,9 +200,12 @@ export default function ViewStudent() {
               <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '24px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   {/* Avatar */}
-                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#DCE9FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0051D5', fontWeight: 700, fontSize: '24px', flexShrink: 0 }}>
-                    {student.full_name.charAt(0).toUpperCase()}
-                  </div>
+                  {/* Avatar */}
+<div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#DCE9FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0051D5', fontWeight: 700, fontSize: '24px', flexShrink: 0, overflow: 'hidden' }}>
+  {(student as any).avatar_url
+    ? <img src={(student as any).avatar_url} alt={student.full_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+    : student.full_name.charAt(0).toUpperCase()}
+</div>
                   <div>
                     <h2 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '20px', color: '#0B1C30', margin: '0 0 4px' }}>{student.full_name}</h2>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>

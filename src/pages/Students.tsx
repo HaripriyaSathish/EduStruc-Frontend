@@ -22,6 +22,7 @@ interface Student {
   address:      string;
   parent_name:  string;
   parent_phone: string;
+  avatar_url?:  string;
 }
 
 const roleLabel: Record<string, string> = {
@@ -324,9 +325,11 @@ export default function Students() {
                       {/* Student Name */}
                       <td style={{ padding: '14px 20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#DCE9FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0051D5', fontWeight: 700, fontSize: '13px', flexShrink: 0 }}>
-                            {student.full_name.charAt(0).toUpperCase()}
-                          </div>
+                          <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#DCE9FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0051D5', fontWeight: 700, fontSize: '13px', flexShrink: 0, overflow: 'hidden' }}>
+  {student.avatar_url
+    ? <img src={student.avatar_url} alt={student.full_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+    : student.full_name.charAt(0).toUpperCase()}
+</div>
                           <div>
                             <p style={{ margin: 0, fontWeight: 600, fontSize: '13px', color: '#0B1C30' }}>{student.full_name}</p>
                             <p style={{ margin: 0, fontSize: '12px', color: '#76777D' }}>{student.email}</p>
