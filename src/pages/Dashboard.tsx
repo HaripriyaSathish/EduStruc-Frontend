@@ -77,6 +77,7 @@ export default function Dashboard() {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showSearch, setShowSearch]     = useState(false);
   const [activeNav, setActiveNav]       = useState('Dashboard');
+  const [showAllActivity, setShowAllActivity] = useState(false);
 
   // ── Notifications ─────────────────────────────────────
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -481,41 +482,45 @@ export default function Dashboard() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '16px', marginBottom: '24px' }}>
 
             {/* Recent Activity — now powered by real Notifications */}
-            <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '16px', color: '#0B1C30', margin: 0 }}>Recent Activity</h3>
-                <span className="view-all" onClick={() => navigate('/students')}
-                  style={{ fontSize: '13px', color: '#0051D5', cursor: 'pointer', textDecoration: 'none' }}>View All</span>
-              </div>
-              {loadingNotifs ? (
-                <p style={{ fontSize: '13px', color: '#76777D', padding: '14px 0' }}>Loading recent activity...</p>
-              ) : notifications.length === 0 ? (
-                <p style={{ fontSize: '13px', color: '#76777D', padding: '14px 0' }}>No recent activity yet.</p>
-              ) : (
-                notifications.slice(0, 5).map((n, i) => (
-                  <div key={n.id} className="activity-item"
-                    style={{ padding: '14px', display: 'flex', gap: '12px', borderBottom: i < Math.min(notifications.length, 5) - 1 ? '1px solid #F0F4FF' : 'none' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#DCE9FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>
-                      {notifIcon(n.type)}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <p style={{ fontWeight: 600, fontSize: '13px', color: '#0B1C30', margin: 0 }}>{n.title}</p>
-                        <span style={{ fontSize: '11px', color: '#76777D' }}>{timeAgo(n.created_at)}</span>
-                      </div>
-                      {n.message && <p style={{ fontSize: '13px', color: '#45464D', margin: '0 0 8px' }}>{n.message}</p>}
-                      {n.link && (
-                        <button className="approve-btn"
-                          onClick={() => navigate(n.link!)}
-                          style={{ background: '#0B1C30', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 14px', fontSize: '12px', fontWeight: 500, cursor: 'pointer', marginTop: '6px', transition: 'all 0.2s ease' }}>
-                          View Details
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+<div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '20px' }}>
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+    <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '16px', color: '#0B1C30', margin: 0 }}>Recent Activity</h3>
+    {notifications.length > 4 && (
+      <span className="view-all" onClick={() => setShowAllActivity(v => !v)}
+        style={{ fontSize: '13px', color: '#0051D5', cursor: 'pointer', textDecoration: 'none' }}>
+        {showAllActivity ? 'View Less' : 'View All'}
+      </span>
+    )}
+  </div>
+  {loadingNotifs ? (
+    <p style={{ fontSize: '13px', color: '#76777D', padding: '14px 0' }}>Loading recent activity...</p>
+  ) : notifications.length === 0 ? (
+    <p style={{ fontSize: '13px', color: '#76777D', padding: '14px 0' }}>No recent activity yet.</p>
+  ) : (
+    (showAllActivity ? notifications : notifications.slice(0, 4)).map((n, i, arr) => (
+      <div key={n.id} className="activity-item"
+        style={{ padding: '14px', display: 'flex', gap: '12px', borderBottom: i < arr.length - 1 ? '1px solid #F0F4FF' : 'none' }}>
+        <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#DCE9FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>
+          {notifIcon(n.type)}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <p style={{ fontWeight: 600, fontSize: '13px', color: '#0B1C30', margin: 0 }}>{n.title}</p>
+            <span style={{ fontSize: '11px', color: '#76777D' }}>{timeAgo(n.created_at)}</span>
+          </div>
+          {n.message && <p style={{ fontSize: '13px', color: '#45464D', margin: '0 0 8px' }}>{n.message}</p>}
+          {n.link && (
+            <button className="approve-btn"
+              onClick={() => navigate(n.link!)}
+              style={{ background: '#0B1C30', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 14px', fontSize: '12px', fontWeight: 500, cursor: 'pointer', marginTop: '6px', transition: 'all 0.2s ease' }}>
+              View Details
+            </button>
+          )}
+        </div>
+      </div>
+    ))
+  )}
+</div>
 
             {/* Right column */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
