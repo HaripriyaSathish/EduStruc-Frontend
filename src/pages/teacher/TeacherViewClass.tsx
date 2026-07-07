@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, BookOpen, Calendar, Settings,
   Plus, HelpCircle, LogOut, GraduationCap, ArrowLeft,
   Users2, Clock, MapPin, FileText, Upload, Trash2,
-  Check, X, Pencil, ChevronUp, ChevronDown, Download as DownloadIcon
+  Check, Pencil, ChevronUp, ChevronDown, Download as DownloadIcon
 } from 'lucide-react';
 import { getSession, logoutUser, apiFetch } from '../../utils/auth';
 import AvatarCircle from '../../components/AvatarCircle';
@@ -14,19 +14,22 @@ interface Course {
   id: number; course_name: string; course_code: string;
   instructor: string; max_students: number; status: string;
   department: string; semester: string; description: string; credits: number;
+  subject_name?: string; grade_name?: string;
 }
 interface Student {
   id: number; full_name: string; email: string;
   roll_number: string; status: string;
 }
+interface GradeRecord {
+  id: number; student: number; score: number; assessment_name: string;
+}
 interface FileItem {
   id: string; name: string; size: string; type: string; date: string;
-  dataUrl?: string; // base64 for real download
+  dataUrl?: string;
 }
 
 type Tab = 'gradebook' | 'materials' | 'overview';
 
-// scoreToGrade — single source of truth for grade letters
 const scoreToGrade = (score: number) => {
   if (score >= 90) return { grade: 'A',  color: '#166534', bg: '#DCFCE7' };
   if (score >= 80) return { grade: 'B+', color: '#1E40AF', bg: '#DBEAFE' };
@@ -44,90 +47,103 @@ export default function TeacherViewClass() {
 
   const [course,      setCourse]      = useState<Course | null>(null);
   const [students,    setStudents]    = useState<Student[]>([]);
+  const [allGrades,   setAllGrades]   = useState<GradeRecord[]>([]);
   const [loading,     setLoading]     = useState(true);
   const [error,       setError]       = useState('');
   const [activeTab,   setActiveTab]   = useState<Tab>('gradebook');
 
-  // Real grade storage — keyed by student id, persisted to localStorage per class
-  const [grades,      setGrades]      = useState<Record<number, { score: number; status: string }>>({});
+  const [assessmentName, setAssessmentName] = useState('Overall Score');
+  const [assessmentType, setAssessmentType] = useState('Exam');
+  const [assessmentDate, setAssessmentDate] = useState(new Date().toISOString().slice(0, 10));
   const [editScores,  setEditScores]  = useState<Record<number, string>>({});
+  const [saving,      setSaving]      = useState(false);
   const [saved,       setSaved]       = useState(false);
-  const [dragOver,    setDragOver]    = useState(false);
-  const [files,       setFiles]       = useState<FileItem[]>([]);
   const [sortDir,     setSortDir]     = useState<'asc'|'desc'>('desc');
+  const [rosterWarning, setRosterWarning] = useState('');
 
-  const storageKey = `edustruc_grades_class_${id}`;
-  const filesKey   = `edustruc_files_class_${id}`;
+  const [dragOver, setDragOver] = useState(false);
+  const [files,    setFiles]    = useState<FileItem[]>([]);
+  const filesKey = `edustruc_files_class_${id}`;
+
+  const fetchAll = async () => {
+    setLoading(true);
+    try {
+      const cRes = await apiFetch(`${API_BASE}/api/courses/${id}/`);
+      if (cRes.ok) {
+        const courseData = await cRes.json();
+        setCourse(courseData);
+        if (!courseData.grade) {
+          setRosterWarning('This class isn\'t linked to a Grade yet — showing all students. Ask an admin to link a Grade to this course for accurate filtering.');
+        }
+      } else {
+        setError('Course not found.');
+      }
+
+      const [sRes, gRes] = await Promise.all([
+        apiFetch(`${API_BASE}/api/courses/${id}/students/`),
+        apiFetch(`${API_BASE}/api/grades/?course=${id}`),
+      ]);
+      if (sRes.ok) setStudents(await sRes.json());
+      if (gRes.ok) setAllGrades(await gRes.json());
+    } catch { setError('Cannot connect to server.'); }
+    finally { setLoading(false); }
+  };
 
   useEffect(() => {
-    const fetchAll = async () => {
-      setLoading(true);
-      try {
-        const [cRes, sRes] = await Promise.all([
-          apiFetch(`${API_BASE}/api/courses/${id}/`),
-          apiFetch(`${API_BASE}/api/students/`),
-        ]);
-        if (cRes.ok) setCourse(await cRes.json());
-        else setError('Course not found.');
-        if (sRes.ok) {
-          const studentList: Student[] = await sRes.json();
-          setStudents(studentList);
-
-          // Load saved grades, or initialize with real defaults (NOT random)
-          const savedGrades = localStorage.getItem(storageKey);
-          if (savedGrades) {
-            setGrades(JSON.parse(savedGrades));
-          } else {
-            // Default: no score yet = 0 attendance, status = same as student record
-            const initial: Record<number, { score: number; status: string }> = {};
-            studentList.forEach(s => {
-              initial[s.id] = { score: 0, status: s.status || 'active' };
-            });
-            setGrades(initial);
-          }
-        }
-      } catch { setError('Cannot connect to server.'); }
-      finally { setLoading(false); }
-    };
     fetchAll();
-
-    // Load saved files
     const savedFiles = localStorage.getItem(filesKey);
     if (savedFiles) setFiles(JSON.parse(savedFiles));
   }, [id]);
 
-  // Save grades whenever they change
-  const persistGrades = (updated: Record<number, { score: number; status: string }>) => {
-    setGrades(updated);
-    localStorage.setItem(storageKey, JSON.stringify(updated));
-  };
+  // Scores for the currently selected assessment name
+  const currentGrades: Record<number, GradeRecord> = {};
+  allGrades.filter(g => g.assessment_name === assessmentName).forEach(g => {
+    currentGrades[g.student] = g;
+  });
 
   const persistFiles = (updated: FileItem[]) => {
     setFiles(updated);
     localStorage.setItem(filesKey, JSON.stringify(updated));
   };
 
-  const handleSaveGrades = () => {
-    // Commit all pending edits into grades
-    const updated = { ...grades };
-    Object.entries(editScores).forEach(([sid, val]) => {
-      if (val !== '') {
-        const score = Math.min(100, Math.max(0, parseInt(val) || 0));
-        updated[Number(sid)] = { ...updated[Number(sid)], score };
+  const handleSaveGrades = async () => {
+    const records = students
+      .map(s => {
+        const pending = editScores[s.id];
+        const existing = currentGrades[s.id];
+        const value = pending !== undefined && pending !== '' ? pending : (existing ? String(existing.score) : undefined);
+        if (value === undefined) return null;
+        return { student: s.id, score: Math.min(100, Math.max(0, parseInt(value) || 0)) };
+      })
+      .filter(Boolean);
+
+    if (records.length === 0) return;
+
+    setSaving(true);
+    try {
+      const res = await apiFetch(`${API_BASE}/api/grades/bulk/`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          course: Number(id),
+          assessment_name: assessmentName,
+          assessment_type: assessmentType,
+          date: assessmentDate,
+          records,
+        }),
+      });
+      if (res.ok) {
+        setSaved(true);
+        setEditScores({});
+        setTimeout(() => setSaved(false), 2500);
+        // Refresh grades from server
+        const gRes = await apiFetch(`${API_BASE}/api/grades/?course=${id}`);
+        if (gRes.ok) setAllGrades(await gRes.json());
       }
-    });
-    persistGrades(updated);
-    setEditScores({});
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    } catch (e) { console.error(e); }
+    finally { setSaving(false); }
   };
 
-  const handleStatusChange = (studentId: number, newStatus: string) => {
-    const updated = { ...grades, [studentId]: { ...grades[studentId], status: newStatus } };
-    persistGrades(updated);
-  };
-
-  // ── File upload with REAL base64 storage (so download works) ──
   const handleFiles = (fileList: FileList) => {
     Array.from(fileList).forEach(f => {
       const reader = new FileReader();
@@ -151,10 +167,7 @@ export default function TeacherViewClass() {
   };
 
   const handleDownload = (file: FileItem) => {
-    if (!file.dataUrl) {
-      alert('This file has no stored content (sample data). Upload a real file to enable download.');
-      return;
-    }
+    if (!file.dataUrl) { alert('This file has no stored content.'); return; }
     const a = document.createElement('a');
     a.href = file.dataUrl;
     a.download = file.name;
@@ -162,15 +175,18 @@ export default function TeacherViewClass() {
   };
 
   const handleDeleteFile = (fileId: string) => {
-    const updated = files.filter(f => f.id !== fileId);
-    persistFiles(updated);
+    persistFiles(files.filter(f => f.id !== fileId));
   };
 
   const sortedStudents = [...students].sort((a, b) => {
-    const scoreA = grades[a.id]?.score || 0;
-    const scoreB = grades[b.id]?.score || 0;
+    const scoreA = currentGrades[a.id]?.score || 0;
+    const scoreB = currentGrades[b.id]?.score || 0;
     return sortDir === 'desc' ? scoreB - scoreA : scoreA - scoreB;
   });
+
+  // Distinct assessment names already recorded for this course, for quick switching
+  const assessmentOptions = Array.from(new Set(allGrades.map(g => g.assessment_name)));
+  if (!assessmentOptions.includes(assessmentName)) assessmentOptions.unshift(assessmentName);
 
   const navItems = [
     { icon: <LayoutDashboard size={16} />, label: 'Dashboard', path: '/teacher/dashboard' },
@@ -197,17 +213,17 @@ export default function TeacherViewClass() {
         .grade-input:focus { border-color: #0051D5; }
         .upload-zone:hover { border-color: #0051D5 !important; background: #F0F7FF !important; cursor: pointer; }
         .file-row:hover { background: #F8FAFF !important; }
-        .save-btn:hover { background: #003DAA !important; }
+        .save-btn:hover:not(:disabled) { background: #003DAA !important; }
+        .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .dl-btn:hover { background: #DCE9FF !important; }
         .del-btn:hover { color: #DC2626 !important; }
-        .status-select { border: 1px solid #C6C6CD; border-radius: 6px; padding: 4px 8px; font-size: 12px; cursor: pointer; outline: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
 
       <aside style={{ width: '240px', background: '#EFF4FF', display: 'flex', flexDirection: 'column', padding: '24px 16px', position: 'fixed', top: 0, left: 0, height: '100vh', zIndex: 40 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', cursor: 'pointer' }} onClick={() => navigate('/teacher/dashboard')}>
           <div style={{ background: '#316BF3', borderRadius: '8px', padding: '6px', display: 'flex' }}><GraduationCap size={20} color="#fff" /></div>
-          <div><p style={{ fontWeight: 700, fontSize: '14px', color: '#fff', margin: 0 }}>EduStruc SMS</p><p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.65)', margin: 0 }}>ADMIN PORTAL</p></div>
+          <div><p style={{ fontWeight: 700, fontSize: '14px', color: '#0B1C30', margin: 0 }}>EduStruc SMS</p><p style={{ fontSize: '10px', color: '#76777D', margin: 0 }}>ADMIN PORTAL</p></div>
         </div>
         <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {navItems.map((item, i) => {
@@ -218,7 +234,7 @@ export default function TeacherViewClass() {
             </div>;
           })}
           <button onClick={() => navigate('/teacher/students/new')}
-            style={{ background: '#003EA8', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', borderRadius: '8px', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', cursor: 'pointer', marginTop: '16px', width: '100%' }}>
+            style={{ background: '#316BF3', border: '1px solid #316BF3', color: '#fff', borderRadius: '8px', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', cursor: 'pointer', marginTop: '16px', width: '100%' }}>
             <Plus size={15} /> Add New Student
           </button>
         </nav>
@@ -267,7 +283,9 @@ export default function TeacherViewClass() {
                   <div>
                     <span style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px' }}>{course.course_code}</span>
                     <h2 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: '22px', color: '#fff', margin: '10px 0 4px' }}>{course.course_name}</h2>
-                    <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)', margin: 0 }}>{course.department} • {course.credits} Credits</p>
+                    <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)', margin: 0 }}>
+                      {course.subject_name && `${course.subject_name} · `}{course.grade_name ? course.grade_name : 'Grade not linked'} · {course.department} · {course.credits} Credits
+                    </p>
                   </div>
                   <button onClick={() => navigate(`/teacher/classes/${id}/edit`)}
                     style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', height: 'fit-content' }}>
@@ -281,6 +299,12 @@ export default function TeacherViewClass() {
                 </div>
               </div>
 
+              {rosterWarning && (
+                <div style={{ background: '#FEF9C3', border: '1px solid #FDE68A', borderRadius: '10px', padding: '10px 14px', marginBottom: '16px', fontSize: '12px', color: '#92400E' }}>
+                  {rosterWarning}
+                </div>
+              )}
+
               <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', overflow: 'hidden' }}>
                 <div style={{ borderBottom: '1px solid #E5E7EB', display: 'flex', padding: '0 20px' }}>
                   {[{ key: 'gradebook', label: '📊 Gradebook' }, { key: 'materials', label: '📁 Class Materials' }, { key: 'overview', label: '📋 Overview' }].map(tab => (
@@ -288,31 +312,55 @@ export default function TeacherViewClass() {
                   ))}
                 </div>
 
-                {/* ── GRADEBOOK — real data, status dropdown, fixed logic ── */}
+                {/* ── GRADEBOOK — real API, filtered roster ── */}
                 {activeTab === 'gradebook' && (
                   <div style={{ padding: '20px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
                       <div>
-                        <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '16px', color: '#0B1C30', margin: '0 0 2px' }}>Gradebook</h3>
-                        <p style={{ fontSize: '12px', color: '#76777D', margin: 0 }}>Enter a score in SCORE column to set the grade. Change STATUS using the dropdown.</p>
+                        <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '16px', color: '#0B1C30', margin: '0 0 2px' }}>
+                          Gradebook{course.subject_name ? ` — ${course.subject_name}` : ''}{course.grade_name ? ` (${course.grade_name})` : ''}
+                        </h3>
+                        <p style={{ fontSize: '12px', color: '#76777D', margin: 0 }}>Enter a score per student for the selected assessment, then Save.</p>
                       </div>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        {saved && <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#D1FAE5', color: '#059669', padding: '6px 12px', borderRadius: '8px', fontSize: '12px' }}><Check size={13} /> Saved!</div>}
-                        <button className="save-btn" onClick={handleSaveGrades}
-                          style={{ background: '#0051D5', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}>
-                          Save All Grades
-                        </button>
+                      {saved && <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#D1FAE5', color: '#059669', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', height: 'fit-content' }}><Check size={13} /> Saved!</div>}
+                    </div>
+
+                    {/* Assessment selector row */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '10px', marginBottom: '16px', alignItems: 'flex-end' }}>
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#76777D', textTransform: 'uppercase', display: 'block', marginBottom: '5px' }}>Assessment Name</label>
+                        <input list="assessment-options" value={assessmentName} onChange={e => setAssessmentName(e.target.value)}
+                          style={{ width: '100%', padding: '8px 10px', border: '1px solid #C6C6CD', borderRadius: '6px', fontSize: '13px' }} />
+                        <datalist id="assessment-options">
+                          {assessmentOptions.map(a => <option key={a} value={a} />)}
+                        </datalist>
                       </div>
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#76777D', textTransform: 'uppercase', display: 'block', marginBottom: '5px' }}>Type</label>
+                        <select value={assessmentType} onChange={e => setAssessmentType(e.target.value)}
+                          style={{ width: '100%', padding: '8px 10px', border: '1px solid #C6C6CD', borderRadius: '6px', fontSize: '13px' }}>
+                          {['Exam', 'Quiz', 'Lab', 'Essay', 'Overall'].map(t => <option key={t}>{t}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#76777D', textTransform: 'uppercase', display: 'block', marginBottom: '5px' }}>Date</label>
+                        <input type="date" value={assessmentDate} onChange={e => setAssessmentDate(e.target.value)}
+                          style={{ width: '100%', padding: '8px 10px', border: '1px solid #C6C6CD', borderRadius: '6px', fontSize: '13px' }} />
+                      </div>
+                      <button className="save-btn" onClick={handleSaveGrades} disabled={saving}
+                        style={{ background: '#0051D5', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 18px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', height: '38px' }}>
+                        {saving ? 'Saving...' : 'Save All Grades'}
+                      </button>
                     </div>
 
                     {students.length === 0 ? (
                       <div style={{ textAlign: 'center', padding: '48px', color: '#76777D' }}>
                         <Users2 size={36} color="#C6C6CD" style={{ display: 'block', margin: '0 auto 12px' }} />
-                        <p>No students enrolled yet</p>
+                        <p>No students found for this class's grade.</p>
                       </div>
                     ) : (
                       <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
                           <thead>
                             <tr style={{ background: '#F8F9FF', borderBottom: '1px solid #E5E7EB' }}>
                               <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: '11px', fontWeight: 600, color: '#76777D' }}>STUDENT NAME</th>
@@ -326,13 +374,13 @@ export default function TeacherViewClass() {
                           </thead>
                           <tbody>
                             {sortedStudents.map(student => {
-                              const stored = grades[student.id] || { score: 0, status: 'active' };
-                              const pending = editScores[student.id];
+                              const existing = currentGrades[student.id];
+                              const pending  = editScores[student.id];
                               const currentScore = pending !== undefined && pending !== ''
                                 ? Math.min(100, Math.max(0, parseInt(pending) || 0))
-                                : stored.score;
+                                : (existing ? existing.score : 0);
                               const gradeInfo = scoreToGrade(currentScore);
-                              const hasUnsaved = pending !== undefined && pending !== '' && parseInt(pending) !== stored.score;
+                              const hasUnsaved = pending !== undefined && pending !== '' && parseInt(pending) !== (existing?.score ?? -1);
 
                               return (
                                 <tr key={student.id} className="table-row" style={{ borderBottom: '1px solid #F0F4FF', background: hasUnsaved ? '#FFFBF0' : '#fff' }}>
@@ -345,11 +393,11 @@ export default function TeacherViewClass() {
                                       </div>
                                     </div>
                                   </td>
-                                  <td style={{ padding: '12px 14px', fontSize: '12px', color: '#45464D', fontFamily: 'monospace' }}>{student.roll_number || `ST-${String(student.id).padStart(5, '0')}`}</td>
+                                  <td style={{ padding: '12px 14px', fontSize: '12px', color: '#45464D', fontFamily: 'monospace' }}>{student.roll_number}</td>
                                   <td style={{ padding: '12px 14px' }}>
                                     <input className="grade-input" type="number" min="0" max="100"
-                                      placeholder="Enter score"
-                                      value={pending !== undefined ? pending : (stored.score || '')}
+                                      placeholder="Score"
+                                      value={pending !== undefined ? pending : (existing ? String(existing.score) : '')}
                                       onChange={e => setEditScores(prev => ({ ...prev, [student.id]: e.target.value }))}
                                       style={{ borderColor: hasUnsaved ? '#F59E0B' : '#E5E7EB' }} />
                                   </td>
@@ -359,13 +407,9 @@ export default function TeacherViewClass() {
                                     {hasUnsaved && <span style={{ fontSize: '10px', background: '#FEF3C7', color: '#D97706', fontWeight: 700, padding: '1px 6px', borderRadius: '4px', marginLeft: '6px' }}>UNSAVED</span>}
                                   </td>
                                   <td style={{ padding: '12px 14px' }}>
-                                    <select className="status-select" value={stored.status} onChange={e => handleStatusChange(student.id, e.target.value)}
-                                      style={{ background: stored.status === 'active' ? '#DCFCE7' : stored.status === 'probation' ? '#FEE2E2' : '#F0F4FF', color: stored.status === 'active' ? '#166534' : stored.status === 'probation' ? '#991B1B' : '#45464D' }}>
-                                      <option value="active">Active</option>
-                                      <option value="probation">Probation</option>
-                                      <option value="excused">Excused</option>
-                                      <option value="withdrawn">Withdrawn</option>
-                                    </select>
+                                    <span style={{ fontSize: '12px', padding: '3px 10px', borderRadius: '999px', background: student.status === 'active' ? '#DCFCE7' : '#F0F4FF', color: student.status === 'active' ? '#166534' : '#45464D', textTransform: 'capitalize' }}>
+                                      {student.status}
+                                    </span>
                                   </td>
                                 </tr>
                               );
@@ -377,7 +421,7 @@ export default function TeacherViewClass() {
                   </div>
                 )}
 
-                {/* ── CLASS MATERIALS — real upload/download/delete ── */}
+                {/* ── CLASS MATERIALS — unchanged ── */}
                 {activeTab === 'materials' && (
                   <div style={{ padding: '20px' }}>
                     <div style={{ marginBottom: '16px' }}>
@@ -439,6 +483,8 @@ export default function TeacherViewClass() {
                         {[
                           { label: 'Course Name', value: course.course_name },
                           { label: 'Course Code', value: course.course_code },
+                          { label: 'Subject',     value: course.subject_name || '—' },
+                          { label: 'Grade',       value: course.grade_name || '—' },
                           { label: 'Department',  value: course.department },
                           { label: 'Credits',     value: `${course.credits} Credits` },
                           { label: 'Max Students',value: String(course.max_students) },
@@ -458,8 +504,8 @@ export default function TeacherViewClass() {
                           <p style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '14px', color: '#0B1C30', margin: '0 0 10px' }}>Quick Stats</p>
                           {[
                             { label: 'Total Students', value: String(students.length) },
-                            { label: 'Active',         value: String(Object.values(grades).filter(g => g.status === 'active').length) },
-                            { label: 'Avg Score',      value: students.length > 0 ? `${Math.round(Object.values(grades).reduce((a, g) => a + (g?.score || 0), 0) / students.length)}` : '0' },
+                            { label: 'Graded (this assessment)', value: String(Object.keys(currentGrades).length) },
+                            { label: 'Avg Score', value: students.length > 0 ? `${Math.round(students.reduce((a, s) => a + (currentGrades[s.id]?.score || 0), 0) / students.length)}` : '0' },
                           ].map(stat => (
                             <div key={stat.label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                               <span style={{ fontSize: '13px', color: '#76777D' }}>{stat.label}</span>
