@@ -88,7 +88,7 @@ export default function TeacherStudents() {
       setLoading(true);
       try {
         const [sRes, cRes] = await Promise.all([
-          apiFetch(`${API_BASE}/api/students/`),
+          apiFetch(`${API_BASE}/api/students/my-students/`),
           apiFetch(`${API_BASE}/api/courses/`),
         ]);
         const studentList: Student[] = sRes.ok ? await sRes.json() : [];
@@ -376,7 +376,7 @@ export default function TeacherStudents() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <select value={selectedGrade} onChange={e => { setSelectedGrade(e.target.value); setCurrentPage(1); }}
                   style={{ padding: '7px 12px', border: '1px solid #C6C6CD', borderRadius: '8px', fontSize: '13px', color: '#45464D', background: '#fff', outline: 'none', cursor: 'pointer' }}>
-                  <option value="all">All Courses</option>
+                  <option value="all">All Grades</option>
                   {availableGrades.map(g => <option key={g} value={g}>{g}</option>)}
                 </select>
                 <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }}
