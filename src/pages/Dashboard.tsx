@@ -220,35 +220,30 @@ export default function Dashboard() {
     },
   ];
 
- const navItems = [
-  { icon: <LayoutDashboard size={16} />, label: 'Dashboard',  path: '/dashboard' },
-  { icon: <Users size={16} />,           label: 'Students',   path: '/students' },
-  { icon: <GraduationCap size={16} />,   label: 'Teachers',   path: '/teachers' },
-  { icon: <BookOpen size={16} />,        label: 'Courses',    path: '/courses' },
-  { icon: <Calendar size={16} />,        label: 'Schedules',  path: '/schedules' },
-  { icon: <ClipboardList size={16} />,   label: 'Attendance', path: '/attendance/bulk' },
-  { icon: <Settings size={16} />,        label: 'Settings',   path: '/settings' },
-];
+  const navItems = [
+    { icon: <LayoutDashboard size={16} />, label: 'Dashboard',  path: '/dashboard' },
+    { icon: <Users size={16} />,           label: 'Students',   path: '/students' },
+    { icon: <GraduationCap size={16} />,   label: 'Teachers',   path: '/teachers' },
+    { icon: <BookOpen size={16} />,        label: 'Courses',    path: '/courses' },
+    { icon: <Calendar size={16} />,        label: 'Schedules',  path: '/schedules' },
+    { icon: <ClipboardList size={16} />,   label: 'Attendance', path: '/attendance/bulk' },
+    { icon: <Settings size={16} />,        label: 'Settings',   path: '/settings' },
+  ];
+
   const quickActions = [
     { icon: <Users size={16} />,    label: 'Add Student',    path: '/students/new' },
     { icon: <BookOpen size={16} />, label: 'Create Course',  path: '/courses/new' },
     { icon: <BarChart3 size={16} />, label: 'Generate Report', path: '/reports' },
   ];
 
-  const activities = [
-    { avatar: '👩', name: 'New Enrollment: Sarah Miller',           desc: 'Enrolled in "Advanced Quantitative Economics" - Group B',               time: '2 mins ago',   tags: ['Verified', 'Academic Year 2024'], action: null,            actionPath: null },
-    { avatar: '📅', name: 'Schedule Update: Math 301',              desc: "Classroom shifted from Lab 4 to Auditorium A for tomorrow's lecture.",   time: '45 mins ago',  tags: [],                                 action: null,            actionPath: null },
-    { avatar: '👨‍🏫', name: 'Grade Submission: Prof. Arthur Thorne', desc: 'Final grades for "Architectural History" have been submitted for review.', time: '2 hours ago', tags: [],                                 action: 'Approve Grades', actionPath: '/students' },
-  ];
-
   const perfData = [
-  { label: 'Eng',  h: 124.8,  color: '#C7D7F8' },
-  { label: 'Math', h: 153.59, color: '#A8BEF0' },
-  { label: 'Sci',  h: 180.47, color: '#316BF3' },
-  { label: 'Arts', h: 138.23, color: '#B8CBF5' },
-  { label: 'Hist', h: 168.95, color: '#9EB8F0' },
-  { label: 'Tech', h: 105.59, color: '#D4E1FA' },
-];
+    { label: 'Eng',  h: 124.8,  color: '#C7D7F8' },
+    { label: 'Math', h: 153.59, color: '#A8BEF0' },
+    { label: 'Sci',  h: 180.47, color: '#316BF3' },
+    { label: 'Arts', h: 138.23, color: '#B8CBF5' },
+    { label: 'Hist', h: 168.95, color: '#9EB8F0' },
+    { label: 'Tech', h: 105.59, color: '#D4E1FA' },
+  ];
 
   const notifIcon = (type: string) => {
     switch (type) {
@@ -332,8 +327,8 @@ export default function Dashboard() {
         {/* Bottom items */}
         <div style={{ borderTop: '1px solid #C6C6CD', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           <div className="sidebar-bottom" onClick={() => navigate('/support')}>
-  <HelpCircle size={15} /> Support
-</div>
+            <HelpCircle size={15} /> Support
+          </div>
           <div className="sidebar-bottom logout-btn" onClick={() => { logoutUser(); navigate('/logged-out'); }}>
             <LogOut size={15} /> Logout
           </div>
@@ -485,40 +480,41 @@ export default function Dashboard() {
           {/* Middle Row */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '16px', marginBottom: '24px' }}>
 
-            {/* Recent Activity */}
+            {/* Recent Activity — now powered by real Notifications */}
             <div style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '12px', padding: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '16px', color: '#0B1C30', margin: 0 }}>Recent Activity</h3>
                 <span className="view-all" onClick={() => navigate('/students')}
                   style={{ fontSize: '13px', color: '#0051D5', cursor: 'pointer', textDecoration: 'none' }}>View All</span>
               </div>
-              {activities.map((a, i) => (
-                <div key={i} className="activity-item"
-                  style={{ padding: '14px', display: 'flex', gap: '12px', borderBottom: i < activities.length - 1 ? '1px solid #F0F4FF' : 'none' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#DCE9FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>{a.avatar}</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <p style={{ fontWeight: 600, fontSize: '13px', color: '#0B1C30', margin: 0 }}>{a.name}</p>
-                      <span style={{ fontSize: '11px', color: '#76777D' }}>{a.time}</span>
+              {loadingNotifs ? (
+                <p style={{ fontSize: '13px', color: '#76777D', padding: '14px 0' }}>Loading recent activity...</p>
+              ) : notifications.length === 0 ? (
+                <p style={{ fontSize: '13px', color: '#76777D', padding: '14px 0' }}>No recent activity yet.</p>
+              ) : (
+                notifications.slice(0, 5).map((n, i) => (
+                  <div key={n.id} className="activity-item"
+                    style={{ padding: '14px', display: 'flex', gap: '12px', borderBottom: i < Math.min(notifications.length, 5) - 1 ? '1px solid #F0F4FF' : 'none' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#DCE9FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>
+                      {notifIcon(n.type)}
                     </div>
-                    <p style={{ fontSize: '13px', color: '#45464D', margin: '0 0 8px' }}>{a.desc}</p>
-                    {a.tags.length > 0 && (
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                        {a.tags.map((tag, j) => (
-                          <span key={j} style={{ background: j === 0 ? '#D1FAE5' : '#DCE9FF', color: j === 0 ? '#009668' : '#0051D5', fontSize: '11px', fontWeight: 500, padding: '2px 8px', borderRadius: '4px' }}>{tag}</span>
-                        ))}
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <p style={{ fontWeight: 600, fontSize: '13px', color: '#0B1C30', margin: 0 }}>{n.title}</p>
+                        <span style={{ fontSize: '11px', color: '#76777D' }}>{timeAgo(n.created_at)}</span>
                       </div>
-                    )}
-                    {a.action && (
-                      <button className="approve-btn"
-                        onClick={() => a.actionPath && navigate(a.actionPath)}
-                        style={{ background: '#0B1C30', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 14px', fontSize: '12px', fontWeight: 500, cursor: 'pointer', marginTop: '6px', transition: 'all 0.2s ease' }}>
-                        {a.action}
-                      </button>
-                    )}
+                      {n.message && <p style={{ fontSize: '13px', color: '#45464D', margin: '0 0 8px' }}>{n.message}</p>}
+                      {n.link && (
+                        <button className="approve-btn"
+                          onClick={() => navigate(n.link!)}
+                          style={{ background: '#0B1C30', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 14px', fontSize: '12px', fontWeight: 500, cursor: 'pointer', marginTop: '6px', transition: 'all 0.2s ease' }}>
+                          View Details
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
             {/* Right column */}
@@ -570,21 +566,21 @@ export default function Dashboard() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h3 style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '16px', color: '#0B1C30', margin: 0 }}>Institutional Performance</h3>
               <div onClick={() => navigate('/reports')}
-  style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '6px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#45464D', transition: 'all 0.2s ease' }}
+                style={{ background: '#fff', border: '1px solid #C6C6CD', borderRadius: '6px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px', color: '#45464D', transition: 'all 0.2s ease' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#0051D5'; (e.currentTarget as HTMLDivElement).style.color = '#0051D5'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = '#C6C6CD'; (e.currentTarget as HTMLDivElement).style.color = '#45464D'; }}>
                 This Quarter <ChevronRight size={12} style={{ transform: 'rotate(90deg)' }} />
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', height: '181px', paddingBottom: '8px' }}>
-  {perfData.map((bar, i) => (
-    <div key={i} className="perf-bar"
-      style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', height: '100%', justifyContent: 'flex-end' }}>
-      <div style={{ width: '100%', height: `${bar.h}px`, background: bar.color, borderRadius: '4px 4px 0 0', transition: 'height 0.4s ease' }}></div>
-      <span style={{ fontSize: '12px', color: '#76777D' }}>{bar.label}</span>
-    </div>
-  ))}
-</div>
+              {perfData.map((bar, i) => (
+                <div key={i} className="perf-bar"
+                  style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', height: '100%', justifyContent: 'flex-end' }}>
+                  <div style={{ width: '100%', height: `${bar.h}px`, background: bar.color, borderRadius: '4px 4px 0 0', transition: 'height 0.4s ease' }}></div>
+                  <span style={{ fontSize: '12px', color: '#76777D' }}>{bar.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </main>
 
